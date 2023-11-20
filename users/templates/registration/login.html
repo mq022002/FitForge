@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% block content %}
-{% include 'navbar.html' %}
 <div class="container main-container">
     <div class="row d-flex justify-content-center">
         <div class="col-6">
@@ -10,7 +9,6 @@
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
                     <input name="username" type="text" class="form-control" id="username" aria-describedby="usernameHelp">
-                    <div id="usernameHelp" class="form-text">Enter your username</div>
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
@@ -23,6 +21,4 @@
         </div>
     </div>
 </div>
-
-{% include 'footer.html' %}
 {% endblock %}
