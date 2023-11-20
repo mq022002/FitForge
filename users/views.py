@@ -10,7 +10,7 @@ def profile(request):
 
 @login_required
 def change_password(request):
-    return render(request, 'registration/password_change_form.html')
+    return render(request, 'registration/password_change.html')
 
 def login(request):
     if request.user.is_authenticated:
