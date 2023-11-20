@@ -8,7 +8,7 @@
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
-                    <input name="username" type="text" class="form-control" id="username" aria-describedby="usernameHelp">
+                    <input name="username" type="text" class="form-control" id="username">
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
@@ -16,8 +16,7 @@
                 </div>
                 <button type="submit" value="Login" class="btn btn-primary">Submit</button>
             </form>   
-
-            <a href="{% url 'home' %}">Back to Home</a>
+            <a class="btn btn-outline-primary mt-4" href="{% url 'home' %}">Back to Home</a>
         </div>
     </div>
 </div>
