@@ -1,8 +1,8 @@
 import requests
-#import dotenv
+import dotenv
 import os
 
-#dotenv.load_dotenv()
+dotenv.load_dotenv()
 
 
 
@@ -14,7 +14,7 @@ def get_exercises(muscle, e_type, difficulty, offset=0):
         "difficulty": difficulty,
         "offset": offset
     }
-    headers = {'X-Api-Key': "dH6cEBILcZsil7497iM5/g==R4o7bqPizPy6G2CP" }
+    headers = {'X-Api-Key': os.getenv("EXERCISE_API_KEY") }
     req = requests.get(url, headers=headers, params=params)
     if req.status_code == 200:
         exercises = req.json()
@@ -40,9 +40,13 @@ Possible types:
 Parameters: type and offset. Returns 10 results. Offset default 0
 """
 def exercise_by_type(e_type, offset=0):
-    url = f"https://api.api-ninjas.com/v1/exercises?type={e_type}&offset={offset}"
-    headers = {'X-Api-Key': os.getenv("dH6cEBILcZsil7497iM5/g==R4o7bqPizPy6G2CP") }
-    req = requests.get(url, headers=headers)
+    url = f"https://api.api-ninjas.com/v1/exercises"
+    params = {
+        'type': e_type,
+        'offset': offset
+    }
+    headers = {'X-Api-Key': os.getenv("EXERCISE_API_KEY") }
+    req = requests.get(url, params=params, headers=headers)
     if req.status_code == 200:
         exercises = req.json()
         for i, exercise in enumerate(exercises):
@@ -78,9 +82,13 @@ Possible muscles:
 Parameters: muscle and offset. Returns 10 results. Offset default 0
 """
 def exercise_by_muscle(muscle, offset=0):
-    url = f"https://api.api-ninjas.com/v1/exercises?muscle={muscle}&offset={offset}"
+    url = f"https://api.api-ninjas.com/v1/exercises"
     headers = {'X-Api-Key': os.getenv("EXERCISE_API_KEY") }
-    req = requests.get(url, headers=headers)
+    params = {
+        'muscle': muscle,
+        'offset': offset
+    }
+    req = requests.get(url, params=params, headers=headers)
     if req.status_code == 200:
         exercises = req.json()
         for i, exercise in enumerate(exercises):
@@ -106,9 +114,13 @@ Possible difficulties:
 Parameters: difficulty and offset. Returns 10 results. Offset default 0
 """
 def exercise_by_difficulty(difficulty, offset=0):
-    url = f"https://api.api-ninjas.com/v1/exercises?difficulty={difficulty}&offset={offset}"
+    url = f"https://api.api-ninjas.com/v1/exercises"
+    params = {
+        'difficulty': difficulty,
+        'offset': offset
+    }
     headers = {'X-Api-Key': os.getenv("EXERCISE_API_KEY") }
-    req = requests.get(url, headers=headers)
+    req = requests.get(url, params=params, headers=headers)
     if req.status_code == 200:
         exercises = req.json()
         for i, exercise in enumerate(exercises):
@@ -124,11 +136,15 @@ def get_exercise_difficulties():
     
 
 def google_image_search(query):
-    GCS_DEVELOPER_KEY = os.getenv('GCS_DEVELOPER_KEY')
-    GCS_CX = os.getenv('GCS_CX')
-    url = f"https://customsearch.googleapis.com/customsearch/v1?key={GCS_DEVELOPER_KEY}&cx={GCS_CX}&q={query}&searchType=image"
+    url = f"https://customsearch.googleapis.com/customsearch/v1"
+    params = {
+        'key': os.getenv('GCS_DEVELOPER_KEY'),
+        'cx': os.getenv('GCS_CX'),
+        'q': query,
+        'searchType': 'image'
+    }
     headers = {'Accept': 'application/json'}
-    req = requests.get(url, headers=headers)
+    req = requests.get(url, params=params, headers=headers)
     if req.status_code == 200:
         images = []
         for item in req.json()['items']:
@@ -140,4 +156,4 @@ def google_image_search(query):
 
 
 if __name__ == '__main__':
-    print(exercise_by_muscle("biceps"))
+    print(exercise_by_type("cardio"))
