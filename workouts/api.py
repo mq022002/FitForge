@@ -119,6 +119,8 @@ def fetch_youtube_link(query):
         'key': os.getenv('GCS_DEVELOPER_KEY'),
         'part': "snippet",
         'q': query,
+        'type': 'video',
+        'videoDuration': 'short'
     }
     headers = {'Accept': 'application/json'}
     req = requests.get(url, params=params, headers=headers)
@@ -136,4 +138,4 @@ def fetch_youtube_link(query):
 
 
 if __name__ == '__main__':
-    fetch_youtube_link("bicep curls exercise tutorial")
+    print(fetch_youtube_link("bicep curls exercise tutorial"))
