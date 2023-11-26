@@ -9,7 +9,7 @@ dotenv.load_dotenv()
 
 """
 Gets a list exercises by specifying a specific muscle, type, and difficulty
-Parameters: muscle, type, difficulty, images, pages, offset
+Arguments: muscle, type, difficulty, images, pages, offset
 - pages is how many multiples of 10 results to get
 - images is boolean whether to get images
 """
@@ -101,8 +101,8 @@ def request_exercise(params, images):
 
                 # add images to exercise request
                 for i, image in enumerate(images):
-                    exercises[i]['image'] = image   
-
+                    exercises[i]['image'] = image 
+                    
             return exercises
         else:
             print("request_exercise api Error", req.status_code)
@@ -112,13 +112,27 @@ def request_exercise(params, images):
         return None
 
 
+def fetch_youtube_link(query):
+    url = "https://www.googleapis.com/youtube/v3/search"
+    params = {
+        'key': os.getenv('GCS_DEVELOPER_KEY'),
+        'part': "snippet",
+        'q': query,
+    }
+    headers = {'Accept': 'application/json'}
+    req = requests.get(url, params=params, headers=headers)
+    if req.status_code == 200:
+        result = req.json()['items'][0]
+        youtube = {
+            'title': result['snippet']['title'],
+            'id': result['id']['videoId'],
+            'thumbnail': result['snippet']['thumbnails']['high']['url']
+        }
+        return youtube
+    else:
+        print("fetch_youtube_link api Error", req.status_code)
+        return None
+
+
 if __name__ == '__main__':
-    start = time.perf_counter()
-    get_exercises("biceps", None, None, False, 1, 0)
-    end = time.perf_counter()
-    print(f"1 page time: {end - start}")
-    
-    start = time.perf_counter()
-    print("len exercises:", len(get_exercises(None, None, "beginner", False, 10, 0)))
-    end = time.perf_counter()
-    print(f"10 pages time: {end - start}")
+    fetch_youtube_link("bicep curls exercise tutorial")
