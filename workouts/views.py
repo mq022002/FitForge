@@ -25,7 +25,7 @@ def exercises(request):
         print(selected_muscle)
         print(selected_type)
         print(selected_difficulty)
-        exercise_list = api.get_exercises(selected_muscle, selected_type, selected_difficulty, 0)
+        exercise_list = api.get_exercises(selected_muscle, selected_type, selected_difficulty)
 
 
 
