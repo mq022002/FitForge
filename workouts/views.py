@@ -11,9 +11,9 @@ def home(request):
     return render(request, 'home.html', context)
 
 def exercises(request):
-    type_list = api.get_exercise_types()
-    muscle_list = api.get_exercise_muscles()
-    difficulty_list = api.get_exercise_difficulties()
+    type_list = api.exercise_types
+    muscle_list = api.exercise_muscles
+    difficulty_list = api.exercise_difficulties
 
     exercise_list = ""
     if request.method == 'POST':
@@ -21,7 +21,7 @@ def exercises(request):
         selected_muscle = request.POST.get('muscle', None)
         selected_type = request.POST.get('type', None)
         selected_difficulty = request.POST.get('difficulty', None)
-        exercise_list = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty)
+        exercise_list = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=3)
 
 
 
@@ -35,7 +35,7 @@ def exercises(request):
 
 def exercise_detail(request, exercise_name):
     exercise = api.get_exercises(name=exercise_name)[0]
-    video = api.fetch_youtube_link(exercise_name)
+    video = api.fetch_youtube_link(exercise['name'])
     url = "https://www.youtube.com/embed/" + video['id']
     context = {
         'exercise': exercise,
