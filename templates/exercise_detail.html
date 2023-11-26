@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}
+Exercises
+{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ exercise.name }}</h1>
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" src="{{ url }}" allowfullscreen></iframe>
+    </div>
+</div>
+{% endblock content %}

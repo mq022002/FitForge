@@ -75,7 +75,7 @@ Exercises
                     {% for exercise in exercises %}
                     <tr>
                         <th class="row">
-                            <p>{{ exercise.name }}</p>
+                            <a href="{% url 'exercise_detail' exercise_name=exercise.name %}">{{ exercise.name }}</p>
                         </th>
                         <td>
                             <p>{{ exercise.muscle }}</p>

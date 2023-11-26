@@ -13,8 +13,9 @@ Arguments: muscle, type, difficulty, images, pages, offset
 - pages is how many multiples of 10 results to get
 - images is boolean whether to get images
 """
-def get_exercises(muscle, e_type, difficulty, images=True, pages=1, offset=0):
+def get_exercises(name=None, muscle=None, e_type=None, difficulty=None, images=True, pages=1, offset=0):
     params = {
+        "name": name,
         "muscle": muscle,
         "type": e_type,
         "difficulty": difficulty,
