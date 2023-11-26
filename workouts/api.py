@@ -9,7 +9,9 @@ dotenv.load_dotenv()
 
 """
 Gets a list exercises by specifying a specific muscle, type, and difficulty
-Parameters: muscle, type, difficulty, offset
+Parameters: muscle, type, difficulty, images, pages, offset
+- pages is how many multiples of 10 results to get
+- images is boolean whether to get images
 """
 def get_exercises(muscle, e_type, difficulty, images=True, pages=1, offset=0):
     params = {
