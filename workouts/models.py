@@ -2,14 +2,12 @@ from django.contrib.auth.models import User
 from django.db import models
 
 class Exercise(models.Model):
-    body_part = models.CharField(max_length=255)
-    equipment = models.CharField(max_length=255)
-    gif_url = models.URLField()
-    exercise_id = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
-    target = models.CharField(max_length=255)
-    secondary_muscles = models.JSONField()
-    instructions = models.JSONField()
+    type = models.CharField(max_length=255, null=True)
+    muscle = models.CharField(max_length=255, null=True)
+    equipment = models.CharField(max_length=255, null=True)
+    difficulty = models.CharField(max_length=255, null=True)
+    instructions = models.TextField()
 
     def __str__(self):
         return self.name
@@ -42,6 +40,7 @@ class UserProfile(models.Model):
         (6, '6 days per week'),
         (7, '7 days per week'),
     ], default=1)
+    
     workout_duration = models.IntegerField()
     overall_intensity = models.CharField(max_length=255, choices=[
         ('High Intensity', 'High Intensity'),
