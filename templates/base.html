@@ -27,14 +27,15 @@
               <li class="nav-item">
                 <a class="nav-link {% if current_page == 'exercises' %}active{% endif %}" href="{% url 'exercises' %}">Exercises</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link {% if current_page == 'profile' %}active{% endif %}" href="{% url 'profile' %}">Account</a>
-              </li>
+              {% if user.is_authenticated %}
+                <li class="nav-item">
+                  <a class="nav-link {% if current_page == 'profile' %}active{% endif %}" href="{% url 'profile' %}">Account</a>
+                </li>
+              {% endif %}
             </ul>
           </div>
           <div class="float-right">
             {% if user.is_authenticated %}
-                <a class="btn btn-outline-primary" href="{% url 'profile' %}">Profile</a>
                 <a class="btn btn-outline-primary" href="{% url 'logout' %}">Logout</a>
             {% else %}
                 <a class="btn btn-outline-primary" href="{% url 'login' %}">Login</a>
