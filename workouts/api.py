@@ -14,6 +14,7 @@ exercise_muscles = ["abdominals", "abductors", "adductors", "biceps", "calves", 
     
 exercise_difficulties = ["beginner", "intermediate", "expert"]
 
+
 """
 Gets a list exercises by specifying a specific muscle, type, and difficulty
 Arguments: muscle, type, difficulty, images, pages, offset
@@ -30,6 +31,7 @@ def get_exercises(name=None, muscle=None, e_type=None, difficulty=None, images=T
     }
     
     threads = []
+    # get multiple pages at once using threading
     with concurrent.futures.ThreadPoolExecutor() as executor:
         for page in range(pages):
             # offset is number of pages * 10 + offset amount
@@ -45,10 +47,11 @@ def get_exercises(name=None, muscle=None, e_type=None, difficulty=None, images=T
     #print(exercises)
     return exercises
 
-
-
     
-
+"""
+Use the google search api to get google images search results
+query: query to search
+"""
 def google_image_search(query):
     url = f"https://customsearch.googleapis.com/customsearch/v1"
     params = {
@@ -81,6 +84,7 @@ def fetch_exercise_image(query):
         print(f"Error in fetch_exercise_image: {e}")
         return None
     
+
 """
 Sends a request to the exercises api given the parameters
 Fetches images if images = True
@@ -114,6 +118,10 @@ def request_exercise(params, images):
         return None
 
 
+"""
+Use the youtube api to search for youtube videos
+query: query to search
+"""
 def fetch_youtube_link(query):
     url = "https://www.googleapis.com/youtube/v3/search"
     params = {

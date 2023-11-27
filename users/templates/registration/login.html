@@ -16,6 +16,11 @@
                 </div>
                 <button type="submit" value="Login" class="btn btn-primary">Submit</button>
             </form>   
+            {% if error %}
+                <div class="alert alert-danger mt-4" role="alert">
+                    <strong>{{error}}</strong>
+                </div>
+            {% endif %}
             <a class="btn btn-outline-primary mt-4" href="{% url 'home' %}">Back to Home</a>
         </div>
     </div>
