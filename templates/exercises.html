@@ -78,16 +78,16 @@ Exercises
                             <a href="{% url 'exercise_detail' exercise_name=exercise.name %}">{{ exercise.name }}</p>
                         </th>
                         <td>
-                            <p>{{ exercise.muscle }}</p>
+                            <p>{{ exercise.muscle | title }}</p>
                         </td>
                         <td>
-                            <p>{{ exercise.type }}</p>
+                            <p>{{ exercise.type | title }}</p>
                         </td>
                         <td>
-                            <p>{{ exercise.difficulty }}</p>
+                            <p>{{ exercise.difficulty | title }}</p>
                         </td>
                         <td>
-                            <p>{{ exercise.equipment }}</p>
+                            <p>{{ exercise.equipment | title }}</p>
                         </td>
                     </tr>
                     {% endfor %}
