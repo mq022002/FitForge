@@ -3,9 +3,16 @@ import dotenv
 import os
 import concurrent.futures
 import time
+import json
 
 dotenv.load_dotenv()
 
+exercise_types = ["cardio", "olympic_weightlifting", "plyometrics", "powerlifting", "strength", "stretching", "strongman"]
+
+exercise_muscles = ["abdominals", "abductors", "adductors", "biceps", "calves", "chest", "forearms", "glutes", "hamstrings", \
+            "lats", "lower_back", "middle_back", "neck", "quadriceps", "traps", "triceps"]
+    
+exercise_difficulties = ["beginner", "intermediate", "expert"]
 
 """
 Gets a list exercises by specifying a specific muscle, type, and difficulty
@@ -26,26 +33,20 @@ def get_exercises(name=None, muscle=None, e_type=None, difficulty=None, images=T
     with concurrent.futures.ThreadPoolExecutor() as executor:
         for page in range(pages):
             # offset is number of pages * 10 + offset amount
-            params['offset'] = (page * 10) + offset
-            threads.append(executor.submit(request_exercise, params, images))
+            current_params = params.copy()
+            current_params['offset'] = (page * 10) + offset
+            threads.append(executor.submit(request_exercise, current_params, images))
     results = [t.result() for t in threads]
 
     exercises = []
     for result in results:
         if result:
             exercises.extend(result)
+    #print(exercises)
     return exercises
 
 
-def get_exercise_types():
-    return ["cardio", "olympic_weightlifting", "plyometrics", "powerlifting", "strength", "stretching", "strongman"]
 
-def get_exercise_muscles():
-    return ["abdominals", "abductors", "adductors", "biceps", "calves", "chest", "forearms", "glutes", "hamstrings", \
-            "lats", "lower_back", "middle_back", "neck", "quadriceps", "traps", "triceps"]
-    
-def get_exercise_difficulties():
-    return ["beginner", "intermediate", "expert"]
     
 
 def google_image_search(query):
@@ -103,7 +104,7 @@ def request_exercise(params, images):
                 # add images to exercise request
                 for i, image in enumerate(images):
                     exercises[i]['image'] = image 
-                    
+            
             return exercises
         else:
             print("request_exercise api Error", req.status_code)
