@@ -2,6 +2,7 @@ import requests
 import dotenv
 import os
 import concurrent.futures
+from bs4 import BeautifulSoup
 import time
 import json
 
@@ -11,7 +12,7 @@ exercise_types = ["cardio", "olympic_weightlifting", "plyometrics", "powerliftin
 
 exercise_muscles = ["abdominals", "abductors", "adductors", "biceps", "calves", "chest", "forearms", "glutes", "hamstrings", \
             "lats", "lower_back", "middle_back", "neck", "quadriceps", "traps", "triceps"]
-    
+
 exercise_difficulties = ["beginner", "intermediate", "expert"]
 
 
@@ -21,7 +22,7 @@ Arguments: muscle, type, difficulty, images, pages, offset
 - pages is how many multiples of 10 results to get
 - images is boolean whether to get images
 """
-def get_exercises(name=None, muscle=None, e_type=None, difficulty=None, images=True, pages=1, offset=0):
+def get_exercises(name=None, muscle=None, e_type=None, difficulty=None, images=False, pages=1, offset=0):
     params = {
         "name": name,
         "muscle": muscle,
@@ -53,6 +54,12 @@ Use the google search api to get google images search results
 query: query to search
 """
 def google_image_search(query):
+    url = f"https://www.google.com/search?q={query}&tbm=isch"
+    req = requests.get(url)
+    soup = BeautifulSoup(req.text, 'html.parser')
+    links = soup.find_all('img')
+    return links[1].get('src')
+    """
     url = f"https://customsearch.googleapis.com/customsearch/v1"
     params = {
         'key': os.getenv('GCS_DEVELOPER_KEY'),
@@ -73,13 +80,13 @@ def google_image_search(query):
     else:
         print("google_image_search Error", req.status_code)
         return None
-
+    """
 
 def fetch_exercise_image(query):
     try:
         images = google_image_search(query + " exercise stock graphic")
         if images:
-            return images[0]
+            return images
     except Exception as e:
         print(f"Error in fetch_exercise_image: {e}")
         return None
@@ -98,7 +105,7 @@ def request_exercise(params, images):
             exercises = req.json()
             if len(exercises) == 0:
                 return None
-            
+
             if images:
                 # send google api requests in threads
                 with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -123,6 +130,13 @@ Use the youtube api to search for youtube videos
 query: query to search
 """
 def fetch_youtube_link(query):
+    url = "https://127.0.0.1:3000/search"
+    params = {
+        'q': query
+    }
+    req = requests.get(url, params=params)
+
+    """
     url = "https://www.googleapis.com/youtube/v3/search"
     params = {
         'key': os.getenv('GCS_DEVELOPER_KEY'),
@@ -144,7 +158,7 @@ def fetch_youtube_link(query):
     else:
         print("fetch_youtube_link api Error", req.status_code)
         return None
-
+    """
 
 if __name__ == '__main__':
-    print(fetch_youtube_link("bicep curls exercise tutorial"))
+    print(get_exercises(images=True))
