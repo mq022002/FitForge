@@ -58,7 +58,19 @@ class UserProfileForm(forms.ModelForm):
         ('triceps', 'Triceps'),
     ]
     
-    focused_muscle_groups = forms.MultipleChoiceField(choices=MUSCLE_GROUP_CHOICES, widget=forms.CheckboxSelectMultiple(attrs={'class': 'list-unstyled'}))
+    focused_muscle_groups = forms.MultipleChoiceField(
+        choices=MUSCLE_GROUP_CHOICES,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'list-unstyled'}),
+        label='Focused Muscle Groups (Select Up to 3)',
+    )
+
+    def clean_focused_muscle_groups(self):
+        selected_muscle_groups = self.cleaned_data['focused_muscle_groups']
+
+        if len(selected_muscle_groups) > 3:
+            raise forms.ValidationError('Too many muscle groups selected. Please select up to 3.')
+
+        return selected_muscle_groups
 
     
     class Meta:
