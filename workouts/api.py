@@ -53,38 +53,19 @@ def get_exercises(name=None, muscle=None, e_type=None, difficulty=None, images=F
 Use the google search api to get google images search results
 query: query to search
 """
-def google_image_search(query):
-    url = f"https://www.google.com/search?q={query}&tbm=isch"
+def image_search(query):
+    url = f"http://127.0.0.1:3000/images?q={query}"
     req = requests.get(url)
-    soup = BeautifulSoup(req.text, 'html.parser')
-    links = soup.find_all('img')
-    return links[1].get('src')
-    """
-    url = f"https://customsearch.googleapis.com/customsearch/v1"
-    params = {
-        'key': os.getenv('GCS_DEVELOPER_KEY'),
-        'cx': os.getenv('GCS_CX'),
-        'q': query,
-        'searchType': 'image'
-    }
-    headers = {'Accept': 'application/json'}
-    req = requests.get(url, params=params, headers=headers)
     if req.status_code == 200:
-        images = []
-        for item in req.json()['items']:
-            images.append(item['link'])
-        return images
-    elif req.status_code == 429:
-        print("Google Images API Error: Too many requests")
-        return None
+        return req.json()['image']
     else:
-        print("google_image_search Error", req.status_code)
+        print("Image search api error: ", req.status_code)
         return None
-    """
+
 
 def fetch_exercise_image(query):
     try:
-        images = google_image_search(query + " exercise stock graphic")
+        images = image_search(query + " exercise stock graphic")
         if images:
             return images
     except Exception as e:
@@ -130,31 +111,24 @@ Use the youtube api to search for youtube videos
 query: query to search
 """
 def fetch_youtube_link(query):
-    pass
-
-    """
-    url = "https://www.googleapis.com/youtube/v3/search"
-    params = {
-        'key': os.getenv('GCS_DEVELOPER_KEY'),
-        'part': "snippet",
-        'q': query,
-        'type': 'video',
-        'videoDuration': 'short'
-    }
-    headers = {'Accept': 'application/json'}
-    req = requests.get(url, params=params, headers=headers)
+    url = f"http://127.0.0.1:3000/youtube?q={query}"
+    req = requests.get(url)
     if req.status_code == 200:
-        result = req.json()['items'][0]
-        youtube = {
-            'title': result['snippet']['title'],
-            'id': result['id']['videoId'],
-            'thumbnail': result['snippet']['thumbnails']['high']['url']
-        }
-        return youtube
+        response = req.json()
+        if len(response['videos']) > 0:
+            video = response['videos'][0]
+            youtube = {
+                'title': video['title'],
+                'id': video['id'],
+                'thumbnail': video['thumbnail']
+            }
+            return youtube
+        else:
+            return None
     else:
-        print("fetch_youtube_link api Error", req.status_code)
+        print("Youtube search api error: ", req.status_code)
         return None
-    """
+
 
 if __name__ == '__main__':
-    print(get_exercises(images=True))
+    print(fetch_youtube_link("test"))
