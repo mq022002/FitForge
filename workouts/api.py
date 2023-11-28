@@ -130,11 +130,7 @@ Use the youtube api to search for youtube videos
 query: query to search
 """
 def fetch_youtube_link(query):
-    url = "https://127.0.0.1:3000/search"
-    params = {
-        'q': query
-    }
-    req = requests.get(url, params=params)
+    pass
 
     """
     url = "https://www.googleapis.com/youtube/v3/search"
