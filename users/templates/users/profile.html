@@ -10,5 +10,15 @@
             <a class="btn btn-secondary" href="{% url 'change_password' %}">Change password</a>
         </div>
     </div>
+    <div class="row mt-4">
+        <div class="col-md-6 offset-md-3">
+            <h2 class="text-center">Workout Generation Parameters</h2>
+            <form method="post" action="{% url 'profile' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Update Profile</button>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

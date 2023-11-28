@@ -23,7 +23,15 @@ def exercises(request):
         selected_difficulty = request.POST.get('difficulty', None)
         exercise_list = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=3)
 
-
+        # Remove backslashes from exercise names
+        # To prevent errors in routes
+        # for exercise in exercise_list:
+        #     exercise['name'] = exercise['name'].replace('/', ' ')
+        #     exercise['equipment'] = exercise['equipment'].replace('_', ' ').capitalize()
+        #     exercise['muscle'] = exercise['muscle'].replace('_', ' ').capitalize()
+        #     exercise['type'] = exercise['type'].replace('_', ' ').capitalize()
+        #     exercise['difficulty'] = exercise['difficulty'].capitalize()
+    
 
     context = {
         'muscles': muscle_list,
@@ -36,9 +44,16 @@ def exercises(request):
 def exercise_detail(request, exercise_name):
     exercise = api.get_exercises(name=exercise_name)[0]
     video = api.fetch_youtube_link(exercise['name'])
-    url = "https://www.youtube.com/embed/" + video['id']
-    context = {
-        'exercise': exercise,
-        'url': url
-    }
+    if(video):
+        url = "https://www.youtube.com/embed/" + video['id']
+        context = {
+            'exercise': exercise,
+            'url': url
+        }
+    else:
+        context = {
+            'exercise': exercise,
+        }
+
     return render(request, 'exercise_detail.html', context)
+

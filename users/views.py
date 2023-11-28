@@ -4,13 +4,25 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib import messages
 from .forms import UserCreateForm
+from .forms import UserProfileForm
 from django.contrib.auth import update_session_auth_hash
-
+from .models import UserProfile
 
 # Create your views here.
 @login_required
 def profile(request):
-    return render(request, 'users/profile.html')
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('profile')
+    else:
+        form = UserProfileForm(instance=user_profile)
+
+    return render(request, 'users/profile.html', {'form': form, 'user_profile': user_profile})
 
 @login_required
 def change_password(request):
