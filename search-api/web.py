@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 PORT = 3000
 
 loop = asyncio.new_event_loop()
-app = Flask("Just yt finder api")
+app = Flask("FitGPT Search API")
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True # pretty json
 
 @app.route("/")
