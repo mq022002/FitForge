@@ -116,13 +116,16 @@ async def request(query: str, sp: str):
 
     return loads(context)["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]
 
+# scrapes bing images to get image search result
 def images(query):
     url = f"https://www.bing.com/images/search?q={query}"
     req = requests.get(url)
     soup = BeautifulSoup(req.text, 'html.parser')
+    # get all image tags
     links = soup.find_all('img')
     max_width = 0
     largest = None
+    # loop through all images to find one with the highest resolution
     for link in links:
         if link.get('width'):
             width = int(link.get('width'))
