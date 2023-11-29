@@ -1,7 +1,7 @@
 # Youtube and Images Search API
 **Adapted from https://github.com/hansputera/youtube-finder**
 
-Modified youtube search route and added image search route
+Added image search route and modified youtube search route
 
 ### Routes
 **/youtube**: Request with query q, query, or title.  Returns youtube search results
