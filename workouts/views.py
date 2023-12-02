@@ -63,19 +63,14 @@ def exercise_detail(request, exercise_name):
     
 def workouts(request):
     user_id = request.user.id
-    print(user_id)
-    workouts = Workout.objects.get(user=user_id)
+    workouts = get_object_or_404(Workout, user=user_id)
     context = { 'workouts': workouts }
-    print(context)
     return render(request, 'workout.html', context=context)
 
 
 def workout(request, workout_name):
     user_id = request.user.id
-    print(workout_name)
-    #workout_id = Workout.objects.get(name=workout, user=user_id).id
     workout_id = get_object_or_404(Workout, name=workout_name, user=user_id).id
-    print(workout_id)
     workout = ExerciseInWorkout.objects.filter(workout_id=workout_id)
-    context = {'workout': workout}
+    context = { 'workout': workout }
     return render(request, 'workout.html', context=context)
