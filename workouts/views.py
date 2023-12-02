@@ -5,6 +5,8 @@ import requests
 from . import api
 from django.views.generic import ListView, DetailView
 from .models import *
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
@@ -61,13 +63,15 @@ def exercise_detail(request, exercise_name):
     return render(request, 'exercise_detail.html', context)
 
     
+@login_required
 def workouts(request):
     user_id = request.user.id
-    workouts = get_object_or_404(Workout, user=user_id)
+    workouts = Workout.objects.get(user=user_id)
     context = { 'workouts': workouts }
     return render(request, 'workout.html', context=context)
 
 
+@login_required
 def workout(request, workout_name):
     user_id = request.user.id
     workout_id = get_object_or_404(Workout, name=workout_name, user=user_id).id
