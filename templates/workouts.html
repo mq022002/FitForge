@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+{% for exercise in object.exercises.all %}
+    <div>
+        <h2>{{ exercise.name }}</h2>
+        <p>{{ exercise.notes }}</p>
+    </div>
+{% empty %}
+    <p>No exercises in this workout.</p>
+{% endfor %}
+{% for workout in workout_details %}
+    {{ workout.notes }}
+{% endfor %}
+
+{{ details.exercise }}
+{% endblock content %}

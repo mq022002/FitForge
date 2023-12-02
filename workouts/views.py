@@ -1,7 +1,10 @@
-from django.shortcuts import render
+from typing import Any
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 import requests
 from . import api
+from django.views.generic import ListView, DetailView
+from .models import *
 
 # Create your views here.
 
@@ -57,3 +60,22 @@ def exercise_detail(request, exercise_name):
 
     return render(request, 'exercise_detail.html', context)
 
+    
+def workouts(request):
+    user_id = request.user.id
+    print(user_id)
+    workouts = Workout.objects.get(user=user_id)
+    context = { 'workouts': workouts }
+    print(context)
+    return render(request, 'workout.html', context=context)
+
+
+def workout(request, workout_name):
+    user_id = request.user.id
+    print(workout_name)
+    #workout_id = Workout.objects.get(name=workout, user=user_id).id
+    workout_id = get_object_or_404(Workout, name=workout_name, user=user_id).id
+    print(workout_id)
+    workout = ExerciseInWorkout.objects.filter(workout_id=workout_id)
+    context = {'workout': workout}
+    return render(request, 'workout.html', context=context)
