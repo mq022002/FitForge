@@ -3,8 +3,7 @@ import dotenv
 import os
 import concurrent.futures
 from bs4 import BeautifulSoup
-import time
-import json
+
 
 dotenv.load_dotenv()
 
@@ -54,14 +53,22 @@ Use the google search api to get google images search results
 query: query to search
 """
 def image_search(query):
-    url = f"http://127.0.0.1:3000/images?q={query}"
+    url = f"https://www.bing.com/images/search?q={query}"
     req = requests.get(url)
-    if req.status_code == 200:
-        return req.json()['image']
-    else:
-        print("Image search api error: ", req.status_code)
-        return None
-
+    soup = BeautifulSoup(req.text, 'html.parser')
+    # get all image tags
+    links = soup.find_all('img')
+    max_width = 0
+    largest = None
+    # loop through all images to find one with the highest resolution
+    for link in links:
+        if link.get('width'):
+            width = int(link.get('width'))
+            if width > max_width:
+                if link.get('src'):
+                    max_width = width
+                    largest = link.get('src')
+    return {'image': largest}
 
 def fetch_exercise_image(query):
     try:
@@ -111,6 +118,28 @@ Use the youtube api to search for youtube videos
 query: query to search
 """
 def fetch_youtube_link(query):
+    url = "https://www.googleapis.com/youtube/v3/search"
+    params = {
+        'key': os.getenv('GCS_DEVELOPER_KEY'),
+        'part': "snippet",
+        'q': query,
+        'type': 'video',
+        'videoDuration': 'short'
+    }
+    headers = {'Accept': 'application/json'}
+    req = requests.get(url, params=params, headers=headers)
+    if req.status_code == 200:
+        result = req.json()['items'][0]
+        youtube = {
+            'title': result['snippet']['title'],
+            'id': result['id']['videoId'],
+            'thumbnail': result['snippet']['thumbnails']['high']['url']
+        }
+        return youtube
+    else:
+        print("fetch_youtube_link api Error", req.status_code)
+        return None
+    """
     url = f"http://127.0.0.1:3000/youtube?q={query}"
     req = requests.get(url)
     if req.status_code == 200:
@@ -128,7 +157,7 @@ def fetch_youtube_link(query):
     else:
         print("Youtube search api error: ", req.status_code)
         return None
-
+    """
 
 if __name__ == '__main__':
     print(fetch_youtube_link("test"))
