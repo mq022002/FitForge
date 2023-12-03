@@ -18,7 +18,7 @@ class Workout(models.Model):
     notes = models.TextField(blank=True)
 
 class ExerciseInWorkout(models.Model):
-    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
+    exercise_id = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     workout_id = models.ForeignKey(Workout, on_delete=models.CASCADE)
     sets = models.IntegerField(default=0)
     reps = models.IntegerField(default=0)

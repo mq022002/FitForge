@@ -1,13 +1,12 @@
 from typing import Any
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-import requests
 from . import api
 from django.views.generic import ListView, DetailView
 from .models import *
 from django.contrib.auth.decorators import login_required
-
-
+from django.views.decorators.http import require_POST
+from .forms import WorkoutForm
 # Create your views here.
 
 def home(request):
@@ -44,7 +43,7 @@ def exercises(request):
         'difficulties': difficulty_list,
         'exercises': exercise_list
     }
-    return render(request, 'exercises.html', context)
+    return render(request, 'exercises/exercises.html', context)
 
 def exercise_detail(request, exercise_name):
     exercise = api.get_exercises(name=exercise_name)[0]
@@ -60,21 +59,56 @@ def exercise_detail(request, exercise_name):
             'exercise': exercise,
         }
 
-    return render(request, 'exercise_detail.html', context)
+    return render(request, 'exercises/exercise_detail.html', context)
 
     
 @login_required
-def workouts(request):
-    user_id = request.user.id
-    workouts = Workout.objects.get(user=user_id)
-    context = { 'workouts': workouts }
-    return render(request, 'workout.html', context=context)
-
-
-@login_required
+@require_POST
 def workout(request, workout_name):
     user_id = request.user.id
     workout_id = get_object_or_404(Workout, name=workout_name, user=user_id).id
     workout = ExerciseInWorkout.objects.filter(workout_id=workout_id)
     context = { 'workout': workout }
-    return render(request, 'workout.html', context=context)
+    return render(request, 'workouts/workout.html', context=context)
+
+
+@login_required
+def read_workouts(request):
+    workouts = Workout.objects.filter(user=request.user.id)
+    context = { 'workouts': workouts }
+    return render(request, 'workouts/workouts.html', context=context)
+
+
+@login_required
+def create_workout(request):
+    # Create a form instance and populate it with data from the request
+    form = WorkoutForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            print("valid")
+            form.save()
+            # return redirect('workouts')
+            return redirect('read_workouts')
+    # if the request does not have post data, a blank form will be rendered
+    return render(request, 'workouts/workout-form.html', {'form': form})
+
+@login_required
+def update_workout(request, id):
+    workout = Workout.objects.get(id=id)
+    form = WorkoutForm(request.POST or None, instance=workout)
+    # check whether it's valid:
+    if form.is_valid():
+        # update the record in the db
+        form.save()
+    
+    return redirect('read_workouts')
+    
+@login_required
+def delete_workout(request, id):
+    workout = Workout.objects.get(id=id)
+
+    # if this is a POST request, we need to delete the form data
+    if request.method == 'POST':
+        workout.delete()
+        # after deleting redirect to view_product page
+    return redirect('read_workouts')
