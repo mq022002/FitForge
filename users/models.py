@@ -3,6 +3,12 @@ from django.db import models
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    age = models.IntegerField(default=0)
+    gender = models.CharField(max_length=255, choices=[
+        ('male', 'Male'),
+        ('female', 'Female'),
+    ])
+    
     fitness_goal = models.CharField(max_length=255, choices=[
         ('Get Stronger', 'Get Stronger'),
         ('Gain Muscle', 'Gain Muscle'),
