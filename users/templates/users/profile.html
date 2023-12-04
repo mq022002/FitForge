@@ -3,15 +3,13 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col text-center">
-            <h1>Home</h1>
-            <p>Hi, {{ user.username }}!</p>
+        <div class="col-md-4 text-center mt-3">
+            <h1 class="display-4">Profile</h1>
+            <p class="lead fs-2">Hi, {{ user.username }}!</p>
             <a class="btn btn-primary" href="{% url 'logout' %}">Logout</a>
             <a class="btn btn-secondary" href="{% url 'change_password' %}">Change password</a>
         </div>
-    </div>
-    <div class="row mt-4">
-        <div class="col-md-6 offset-md-3">
+        <div class="col-md-8 mt-3">
             <h2 class="text-center">Workout Generation Parameters</h2>
             <form method="post" action="{% url 'profile' %}">
                 {% csrf_token %}
