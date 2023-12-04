@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib import messages
-from .forms import UserCreateForm
 from .forms import UserProfileForm
+from .forms import UserCreateForm
 from django.contrib.auth import update_session_auth_hash
 from .models import UserProfile
 
@@ -28,7 +28,6 @@ def profile(request):
 def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
-        print(form.__repr__)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
