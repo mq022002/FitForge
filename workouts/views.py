@@ -93,6 +93,7 @@ def read_exercises(request):
 
         return JsonResponse({'exercises': exercises})
 
+
 def read_workout(request):
     if request.method == 'POST':
         print("reading workout")
@@ -105,21 +106,44 @@ def read_workout(request):
         workout_details = workout.get_workout_details();
         print(workout_details)
         return JsonResponse({'workout': workout_details})
-# def create_workout_exercise(request):
-    # if request.method == 'POST':
 
 
-def _workout_exercises(workout_id, user_id):
-    workout_id = Workout.objects.get(id=workout_id, user=user_id).id
-    workout_exercises = ExerciseInWorkout.objects.filter(workout_id=workout_id)
-    exercise_list = []
-    for exercise in workout_exercises:
-        exercise_data = {}
-        exercise_data.update(exercise.exercise_id.__dict__)
-        exercise_data.update(exercise.__dict__)
-        del exercise_data['_state']
-        exercise_list.append(exercise_data)
-    return exercise_list
+def add_exercise(request):
+    if request.method == 'POST':
+        try:
+            exercise = request.POST.get('exercise', None)
+            exercise_parameters = request.POST.get('exercise_parameters', None)
+            workout_id = request.POST.get('workout_id', None)
+            # makes sure both db inserts are successful
+            with transaction.atomic():
+                # if exercise doesn't exist in db, add it
+                if not Exercise.objects.filter(name=exercise['name']).exists():
+                    exercise_insert = Exercise(
+                        name=exercise['name'], 
+                        type=exercise['type'],
+                        muscle=exercise['muscle'],
+                        equipment=exercise['equipment'],
+                        difficulty=exercise['difficulty'],
+                        instructions=exercise['instructions']
+                    )
+                    exercise_insert.save()
+                # add exercise to workout
+                exercise_id = Exercise.objects.get(name=exercise['name']).id
+                exercise_in_workout = ExerciseInWorkout(
+                    exercise_id=exercise_id,
+                    workout_id=workout_id,
+                    sets=exercise_parameters['sets'],
+                    reps=exercise_parameters['reps'],
+                    weight=exercise_parameters['weight'],
+                    notes=exercise_parameters['notes']
+                )
+                exercise_in_workout.save()
+        except IntegrityError:
+            # if there is an error, return a bad request
+            return HttpResponse(status=400)
+        # return a success response
+        return HttpResponse(status=200)
+
 
 def exercise_detail(request, exercise_name):
     exercise = api.get_exercises(name=exercise_name)[0]

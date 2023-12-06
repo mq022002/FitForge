@@ -15,4 +15,5 @@ urlpatterns = [
     path('workouts/<str:workout_name>', views.workout, name='workout_detail'),
     
     path('workout/read', views.read_workout, name='read_workout'),
+    path('workout/add-exercise', views.add_exercise, name='add_exercise'),
 ]
