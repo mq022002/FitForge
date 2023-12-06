@@ -62,18 +62,58 @@ Exercises
                 }
             })
         });
+
+        $('#add-exercise-to-workout').click(function() {
+            console.log("adding exercise to workout");
+
+            const workout_id = $('#workout-selector').val();
+            const sets = $('#sets').val();
+            const reps = $('#reps').val();
+            const weight = $('#weight').val();
+            const notes = $('#notes').val();
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url "add_exercise" %}',
+                data: {
+                    'csrfmiddlewaretoken': window.CSRF_TOKEN,
+                    'exercise_name': selectedExercise.name,
+                    'exercise_type': selectedExercise.type,
+                    'exercise_muscle': selectedExercise.muscle,
+                    'exercise_equipment': selectedExercise.equipment,
+                    'exercise_difficulty': selectedExercise.difficulty,
+                    'exercise_instructions': selectedExercise.instructions,
+                    'sets': $('#sets').val(),
+                    'reps': $('#reps').val(),
+                    'weight': $('#weight').val(),
+                    'notes': $('#notes').val(),
+                    'workout_id': workout_id
+                },
+                success: function(data) {
+                    console.log("success " + data);
+                }
+            })
+        });
     });
+    
+    $(document).on('click', '.add-exercise', function() {
+        selectedExercise = $(this).data('exercise');
+    });
+
 
     function updateExercisesTable(exercises) {
         var tableBody = $('#exercises-table tbody');
         tableBody.empty(); // Clear current table body
         $.each(exercises, function(i, exercise) {
             const row = $('<tr></tr>');
-            row.append($('<td></td>').text(exercise.name));
-            row.append($('<td></td>').text(exercise.muscle));
-            row.append($('<td></td>').text(exercise.type));
+            row.append($('<td id="exercise-name"></td>').text(exercise.name));
+            row.append($('<td id="exercise-muscle"></td>').text(exercise.muscle));
+            row.append($('<td id="exercise-type"></td>').text(exercise.type));
             row.append($('<td></td>').text(exercise.equipment));
             row.append($('<td></td>').text(exercise.difficulty));
+            const addButton = $('<button class="btn btn-primary add-exercise" data-bs-toggle="modal" data-bs-target="#exerciseModal">Add</button>');
+            addButton.data('exercise', exercise); // Attach the entire exercise object
+            row.append($('<td></td>').append(addButton));
             tableBody.append(row);
         });
     }
@@ -81,7 +121,57 @@ Exercises
 {% endblock scripts %}
 
 {% block content %}
-<div class="container-fluid"> 
+
+<!-- Add exercise modal -->
+<div class="modal fade" id="exerciseModal" tabindex="-1" aria-labelledby="exerciseModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exerciseModalLabel">Add Exercise</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <h5 class="text-center">Exercise Name</h5>
+            <form>
+                <div class="row">
+                    <div class="col">
+                        <div class="mb-3 text-center lead">
+                            <label for="sets" class="form-label">Sets</label>
+                            <input type="number" class="form-control" id="sets" placeholder="0" min="0" value="3">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="mb-3 text-center lead">
+                            <label for="reps" class="form-label">Reps</label>
+                            <input type="number" class="form-control" id="reps" placeholder="0" min="0" value="10">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="mb-3 text-center lead">
+                            <label for="weight" class="form-label">Weight</label>
+                            <input type="number" class="form-control" id="weight" placeholder="0" min="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="mb-3 lead">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea type="text" class="form-control" id="notes" rows="3" placeholder="Enter your notes here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="add-exercise-to-workout" type="button" class="btn btn-primary">Add to Workout</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="container-fluid">
     <h2>Search for Exercises</h2>
     <div class="row">
         <div class="col-md-10">

@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 from .forms import WorkoutForm
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.db import transaction, IntegrityError
 # Create your views here.
 
 def home(request):
@@ -91,6 +92,19 @@ def read_exercises(request):
         # API call
         exercises = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=api_pages_to_return, offset=offset)
 
+        # Process exercises to remove underscores from keys
+        for exercise in exercises:
+            exercise['name'] = exercise['name'].title().replace('_', ' ')
+            exercise['muscle'] = exercise['muscle'].title().replace('_', ' ')
+            exercise['type'] = exercise['type'].title().replace('_', ' ')
+            exercise['equipment'] = exercise['equipment'].title().replace('_', ' ')
+            exercise['difficulty'] = exercise['difficulty'].title().replace('_', ' ')
+        # Process exercises to remove underscores from keys and capitalize them
+
+        # for i, exercise in enumerate(exercises):
+        #     formatted_exercise = {key.replace('_', ' ').title(): value for key, value in exercise.items()}
+        #     exercises[i] = formatted_exercise
+
         return JsonResponse({'exercises': exercises})
 
 
@@ -111,31 +125,40 @@ def read_workout(request):
 def add_exercise(request):
     if request.method == 'POST':
         try:
-            exercise = request.POST.get('exercise', None)
-            exercise_parameters = request.POST.get('exercise_parameters', None)
-            workout_id = request.POST.get('workout_id', None)
+            exercise_name = request.POST.get('exercise_name')
+            exercise_type = request.POST.get('exercise_type')
+            exercise_muscle = request.POST.get('exercise_muscle')
+            exercise_equipment = request.POST.get('exercise_equipment')
+            exercise_difficulty = request.POST.get('exercise_difficulty')
+            exercise_instructions = request.POST.get('exercise_instructions')
+            sets = request.POST.get('sets')
+            reps = request.POST.get('reps')
+            weight = request.POST.get('weight')
+            notes = request.POST.get('notes')
+            workout_id = request.POST.get('workout_id')
             # makes sure both db inserts are successful
             with transaction.atomic():
                 # if exercise doesn't exist in db, add it
-                if not Exercise.objects.filter(name=exercise['name']).exists():
+                if not Exercise.objects.filter(name=exercise_name).exists():
                     exercise_insert = Exercise(
-                        name=exercise['name'], 
-                        type=exercise['type'],
-                        muscle=exercise['muscle'],
-                        equipment=exercise['equipment'],
-                        difficulty=exercise['difficulty'],
-                        instructions=exercise['instructions']
+                        name=exercise_name, 
+                        type=exercise_type,
+                        muscle=exercise_muscle,
+                        equipment=exercise_equipment,
+                        difficulty=exercise_difficulty,
+                        instructions=exercise_instructions
                     )
                     exercise_insert.save()
                 # add exercise to workout
-                exercise_id = Exercise.objects.get(name=exercise['name']).id
+                exercise = Exercise.objects.get(name=exercise_name)
+                workout = Workout.objects.get(id=workout_id)
                 exercise_in_workout = ExerciseInWorkout(
-                    exercise_id=exercise_id,
-                    workout_id=workout_id,
-                    sets=exercise_parameters['sets'],
-                    reps=exercise_parameters['reps'],
-                    weight=exercise_parameters['weight'],
-                    notes=exercise_parameters['notes']
+                    exercise_id=exercise,
+                    workout_id=workout,
+                    sets=sets,
+                    reps=reps,
+                    weight=weight,
+                    notes=notes
                 )
                 exercise_in_workout.save()
         except IntegrityError:
