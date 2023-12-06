@@ -26,6 +26,18 @@ class UserCreateForm(UserCreationForm):
             'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': "Password"}),
             'password2': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': "Confirm Password"}),
         }
+        
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.save()
+
+        UserProfile.objects.create(
+            user=user,
+            age=self.cleaned_data['age'],
+            gender=self.cleaned_data['gender']
+        )
+
+        return user
 
 class ChangePasswordForm(PasswordChangeForm):
 
@@ -75,9 +87,11 @@ class UserProfileForm(forms.ModelForm):
     
     class Meta:
         model = UserProfile
-        fields = ['fitness_goal', 'frequency', 'workout_duration', 'overall_intensity', 'focused_muscle_groups']
+        fields = ['age', 'gender', 'fitness_goal', 'frequency', 'workout_duration', 'overall_intensity', 'focused_muscle_groups']
 
         widgets = {
+            'age': forms.NumberInput(attrs={'class': 'form-control'}),
+            'gender': forms.Select(attrs={'class': 'form-control'}),
             'fitness_goal': forms.Select(attrs={'class': 'form-control'}),
             'frequency': forms.Select(attrs={'class': 'form-control'}),
             'workout_duration': forms.NumberInput(attrs={'class': 'form-control'}),
