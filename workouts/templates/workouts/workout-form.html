@@ -8,12 +8,12 @@
 {% block content %}
 <div class="container">
     <h1>Workout Form</h1>
-    <form method="post" action="">
+    <form method="post" action="{% url 'workouts' %}">
         {% csrf_token %}
         {{ form|crispy }}
 
         <div class="my-3">
-            <a href="{% url 'read_workouts' %}" class="btn btn-info"><i class="fas fa-arrow-left"></i> Go Back</a>
+            <a href="{% url 'workouts' %}" class="btn btn-info"><i class="fas fa-arrow-left"></i> Go Back</a>
             <button type="reset" class="btn btn-warning"><i class="fas fa-redo-alt"></i> Reset</button>
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
         </div>
