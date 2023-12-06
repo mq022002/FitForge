@@ -96,10 +96,15 @@ def read_exercises(request):
 def read_workout(request):
     if request.method == 'POST':
         print("reading workout")
+        # workout_id = request.POST.get('workout_id', None)
+        # workout_exercises = _workout_exercises(workout_id, request.user.id)
+        # return JsonResponse({'exercises': workout_exercises})
         workout_id = request.POST.get('workout_id', None)
-        workout_exercises = _workout_exercises(workout_id, request.user.id)
-        return JsonResponse({'exercises': workout_exercises})
-
+        user_id = request.user.id
+        workout = Workout.objects.get(id=workout_id, user=user_id)
+        workout_details = workout.get_workout_details();
+        print(workout_details)
+        return JsonResponse({'workout': workout_details})
 # def create_workout_exercise(request):
     # if request.method == 'POST':
 

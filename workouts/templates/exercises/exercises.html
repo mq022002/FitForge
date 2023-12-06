@@ -51,7 +51,8 @@ Exercises
                 },
                 success: function(data) {
                     $('#exercises').empty();
-                    for (let exercise of data.exercises) {
+                    const workout = data.workout
+                    for (let exercise of workout.exercises) {
                         $('#exercises').append(
                             `<div class='border text-center lead bg-white rounded p-1 my-1'>
                                 ${exercise.name}
