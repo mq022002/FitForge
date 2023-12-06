@@ -24,18 +24,17 @@
                             <button type="submit" class="btn btn-success"><i class="fa-solid fa-trash"></i></button>
                         </form>
                     </td>
+                    <td>
+                        <form method="post" action="{% url 'view_workout' forloop.counter %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">View</button>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
-
-
-{% comment %} <form action="{% url 'create_workout' %}" method="post">
-    {% csrf_token %}
-    {{ form.as_div }}
-    <input type="submit" value="Create Workout">
-</form> {% endcomment %}
 
 <a href="{% url 'create_workout' %}" class="btn btn-success"><i class="fas fa-plus"></i> Create Workout</a>
 </div>
