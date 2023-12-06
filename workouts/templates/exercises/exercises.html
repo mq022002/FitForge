@@ -11,6 +11,72 @@ Exercises
 {% block scripts %}
 <script type="text/javascript"> window.CSRF_TOKEN = "{{ csrf_token }}"; </script> 
 <script src="{% static 'js/exercises.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        $('.exercise-row').click(function() {
+            // Toggle the next element which is the hidden details
+            $(this).next('.exercise-details').toggle();
+        });
+        
+
+
+        $('#exercises-form').submit(function(event) {
+            event.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '{% url "read_exercises" %}',
+                data: {
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                    muscle: $('input[name=muscle]:checked').val(),
+                    type: $('input[name=type]:checked').val(),
+                    difficulty: $('input[name=difficulty]:checked').val(),
+                    // Add other form data as needed
+                },
+                success: function(data) {
+                    updateExercisesTable(data.exercises);
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            })
+        });
+
+        $('#workout-selector').on('change', (event) => {
+            $.ajax({
+                type: 'POST',
+                url: '{% url "read_workout" %}',
+                data: {
+                    'csrfmiddlewaretoken': window.CSRF_TOKEN,
+                    'workout_id': event.target.value
+                },
+                success: function(data) {
+                    $('#exercises').empty();
+                    for (let exercise of data.exercises) {
+                        $('#exercises').append(
+                            `<div class='border text-center lead bg-white rounded p-1 my-1'>
+                                ${exercise.name}
+                            </div>`
+                        )
+                    }
+                }
+            })
+        });
+    });
+
+    function updateExercisesTable(exercises) {
+        var tableBody = $('#exercises-table tbody');
+        tableBody.empty(); // Clear current table body
+        $.each(exercises, function(i, exercise) {
+            const row = $('<tr></tr>');
+            row.append($('<td></td>').text(exercise.name));
+            row.append($('<td></td>').text(exercise.muscle));
+            row.append($('<td></td>').text(exercise.type));
+            row.append($('<td></td>').text(exercise.equipment));
+            row.append($('<td></td>').text(exercise.difficulty));
+            tableBody.append(row);
+        });
+    }
+</script>
 {% endblock scripts %}
 
 {% block content %}
@@ -21,11 +87,9 @@ Exercises
         <div class="border rounded shadow mb-5">
             <div class="p-4">
 
-                <form id="filters" action="{% url 'exercises' %}" method="post">
+                <form id="exercises-form" method="POST">
                     {% csrf_token %}
-                    {{ form | crispy }}
                     <div class="row">
-
                         <div class="col-4 mx-3">
                             <h5 class="text-center border-bottom">Muscle</h5>
                             <div class="row pt-3">
@@ -63,7 +127,7 @@ Exercises
                         </div>
                     </div>
 
-                    <button type="submit" name="exercise_form" class="btn btn-primary">Submit</button>
+                    <button type="submit" name="exercise_form" class="btn btn-primary" id="submit-form">Submit</button>
                 </form>
 
             </div>
@@ -118,7 +182,7 @@ Exercises
             {% endcomment %}
 
             <div class="p-4">
-                <table class="table table-hover">
+                <table class="table table-hover" id="exercises-table">
                     <thead>
                         <tr>
                             <th scope="col">Name</th>
@@ -129,43 +193,7 @@ Exercises
                         </tr>
                     </thead>
                     <tbody>
-                        {% for exercise in exercises %}
-                        <tr class="exercise-row">
-                            <th>
-                                {% comment %} <a href="{% url 'exercise_detail' exercise_name=exercise.name %}">{{ exercise.name | title }}</p> {% endcomment %}
-                                <p>{{ exercise.name | title }}</p>
-                            </th>
-                            <td>
-                                <p>{{ exercise.muscle | title | spacify:"_" }}</p>
-                            </td>
-                            <td>
-                                <p>{{ exercise.type | title | spacify:"_" }}</p>
-                            </td>
-                            <td>
-                                <p>{{ exercise.equipment | title | spacify:"_" }}</p>
-                            </td>
-                            <td>
-                                <div class="{% if exercise.difficulty == 'beginner' %}
-                                    bg-success
-                                {% elif exercise.difficulty == 'intermediate' %}
-                                    bg-warning
-                                {% else %}
-                                    bg-danger
-                                {% endif %} text-white p-1 rounded-3 d-flex align-items-center justify-content-center">
-                                    <p class="m-auto">
-                                        {{ exercise.difficulty | title | spacify:"_" }}
-                                    </p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="exercise-details" style="display: none;">
-                            <td colspan="5">
-                                <!-- Additional details here -->
-                                <p>Instructions: {{ exercise.instructions }}</p>
-                                <!-- You can add more details here -->
-                            </td>
-                        </tr>
-                        {% endfor %}
+
                     </tbody>
                 </table>
             </div>
@@ -193,7 +221,6 @@ Exercises
                 </div>
             </div>
         </div>
-    </div>
     </div>
 </div>
 {% endblock content %}

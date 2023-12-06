@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .forms import WorkoutForm
 from django.http import HttpResponse
-import json
+from django.http import JsonResponse
 # Create your views here.
 
 def home(request):
@@ -16,7 +16,7 @@ def home(request):
     context = {'name': 'John'}
     return render(request, 'home.html', context)
 
-
+# Only responsible for grabbing information that should be shown when the page loads
 def exercises(request):
     type_list = api.exercise_types
     muscle_list = api.exercise_muscles
@@ -27,53 +27,33 @@ def exercises(request):
     for workout in workouts:
         workout_list.append({'id': workout.id, 'name': workout.name})
 
-    exercise_list = ""
-    if request.method == 'POST':
-        print("post", request.POST)
-        if 'exercise_form' in request.POST:
-            # Use the .get() method with a default value of None
-            selected_muscle = request.POST.get('muscle', None)
-            selected_type = request.POST.get('type', None)
-            selected_difficulty = request.POST.get('difficulty', None)
-            page = request.POST.get('page', 0)
-            # how many pages to fetch from api (page = 10 results)
-            api_pages_to_return = 3
-            # offset from api = page from request * 10 * pages to return from api
-            offset = page * api_pages_to_return * 10
-            exercise_list = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=api_pages_to_return, offset=offset)
-            return HttpResponse(json.dumps(exercise_list), content_type='application/json')
-        elif 'workout_form' in request.POST:
-            workout_id = request.POST.get('workout_id', None)
-            workout = _workout_exercises(workout_id, request.user.id)
-            exercises = {'exercises': workout}
-            return HttpResponse(json.dumps(exercises), content_type='application/json')
-        elif 'add_exercise' in request.POST:
-            exercise = request.POST.get('exercise', None)
-            exercise_parameters = request.POST.get('exercise_parameters', None)
-            workout_id = request.POST.get('workout_id', None)
-            # if exercise doesn't exist in db, add it
-            if not Exercise.objects.filter(name=exercise['name']).exists():
-                exercise_insert = Exercise(
-                    name=exercise['name'], 
-                    type=exercise['type'],
-                    muscle=exercise['muscle'],
-                    equipment=exercise['equipment'],
-                    difficulty=exercise['difficulty'],
-                    instructions=exercise['instructions']
-                )
-                exercise_insert.save()
-            # add exercise to workout
-            exercise_id = Exercise.objects.get(name=exercise['name']).id
-            exercise_in_workout = ExerciseInWorkout(
-                exercise_id=exercise_id,
-                workout_id=workout_id,
-                sets=exercise_parameters['sets'],
-                reps=exercise_parameters['reps'],
-                weight=exercise_parameters['weight'],
-                notes=exercise_parameters['notes']
-            )
-            exercise_in_workout.save()
-            return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+    #     elif 'add_exercise' in request.POST:
+    #         exercise = request.POST.get('exercise', None)
+    #         exercise_parameters = request.POST.get('exercise_parameters', None)
+    #         workout_id = request.POST.get('workout_id', None)
+    #         # if exercise doesn't exist in db, add it
+    #         if not Exercise.objects.filter(name=exercise['name']).exists():
+    #             exercise_insert = Exercise(
+    #                 name=exercise['name'], 
+    #                 type=exercise['type'],
+    #                 muscle=exercise['muscle'],
+    #                 equipment=exercise['equipment'],
+    #                 difficulty=exercise['difficulty'],
+    #                 instructions=exercise['instructions']
+    #             )
+    #             exercise_insert.save()
+    #         # add exercise to workout
+    #         exercise_id = Exercise.objects.get(name=exercise['name']).id
+    #         exercise_in_workout = ExerciseInWorkout(
+    #             exercise_id=exercise_id,
+    #             workout_id=workout_id,
+    #             sets=exercise_parameters['sets'],
+    #             reps=exercise_parameters['reps'],
+    #             weight=exercise_parameters['weight'],
+    #             notes=exercise_parameters['notes']
+    #         )
+    #         exercise_in_workout.save()
+    #         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
             #return render(request, 'exercises/exercises.html', {'exercises': exercise_list, 'workouts': workout_list})
         # Remove backslashes from exercise names
         # To prevent errors in routes
@@ -89,10 +69,40 @@ def exercises(request):
         'muscles': muscle_list,
         'types': type_list,
         'difficulties': difficulty_list,
-        'exercises': exercise_list,
         'workout_list': workout_list
     }
     return render(request, 'exercises/exercises.html', context)
+
+
+def read_exercises(request):
+    if request.method == 'POST':
+        # Use the .get() method with a default value of None
+        selected_muscle = request.POST.get('muscle', None)
+        selected_type = request.POST.get('type', None)
+        selected_difficulty = request.POST.get('difficulty', None)
+        page = request.POST.get('page', 0)
+
+        # how many pages to fetch from api (page = 10 results)
+        api_pages_to_return = 3
+
+        # offset from api = page from request * 10 * pages to return from api
+        offset = page * api_pages_to_return * 10
+
+        # API call
+        exercises = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=api_pages_to_return, offset=offset)
+
+        return JsonResponse({'exercises': exercises})
+
+def read_workout(request):
+    if request.method == 'POST':
+        print("reading workout")
+        workout_id = request.POST.get('workout_id', None)
+        workout_exercises = _workout_exercises(workout_id, request.user.id)
+        return JsonResponse({'exercises': workout_exercises})
+
+# def create_workout_exercise(request):
+    # if request.method == 'POST':
+
 
 def _workout_exercises(workout_id, user_id):
     workout_id = Workout.objects.get(id=workout_id, user=user_id).id
@@ -134,7 +144,7 @@ def workout(request, workout_name):
 
 
 @login_required
-def read_workouts(request):
+def workouts(request):
     workouts = Workout.objects.filter(user=request.user.id)
     context = { 'workouts': workouts }
     return render(request, 'workouts/workouts.html', context=context)
