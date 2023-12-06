@@ -53,4 +53,5 @@ class ExerciseInWorkout(models.Model):
     sets = models.IntegerField(default=0)
     reps = models.IntegerField(default=0)
     weight = models.FloatField(null=True, blank=True)
+    rest_time = models.IntegerField(default=0)
     notes = models.TextField(blank=True)
