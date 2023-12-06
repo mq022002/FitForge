@@ -179,7 +179,7 @@ Exercises
 <div class="container-fluid main-container">
     <h2>Search for Exercises</h2>
     <div class="row">
-        <div class="col-md-10">
+        <div class="{% if user.is_authenticated %} col-md-10 {% else %} col-md-12 {% endif %}">
         <div class="border rounded shadow mb-5">
             <div class="p-4">
 
@@ -248,28 +248,31 @@ Exercises
             </div>
         </div>
     </div>
-    <div class="col-md-2">
-        <div class="bg-light border shadow rounded px-2 py-3 sticky-top">
-            <h2 class="text-center">Workout</h2>
-            <select id="workout-selector" class="form-select" aria-label="Workout Select">
-                <option selected disabled>Select a workout</option>
-                {% for workout in workout_list %}
-                    <option value="{{ workout.id }}">{{ workout.name }}</option>
-                {% endfor %}
-            </select>
-            <div id="workout-exercises">
-                <div class="mb-5">
-                    <div class="p-4">
-                        <h5 class="text-center border-bottom">Exercises</h5>
-                        <div class="row">
-                            <div class="col-12" id="exercises-in-workout">
-                                <p class="text-center">No exercises selected</p>
+
+    {% if user.is_authenticated %}
+        <div class="col-md-2">
+            <div class="bg-light border shadow rounded px-2 py-3 sticky-top">
+                <h2 class="text-center">Workout</h2>
+                <select id="workout-selector" class="form-select" aria-label="Workout Select">
+                    <option selected disabled>Select a workout</option>
+                    {% for workout in workout_list %}
+                        <option value="{{ workout.id }}">{{ workout.name }}</option>
+                    {% endfor %}
+                </select>
+                <div id="workout-exercises">
+                    <div class="mb-5">
+                        <div class="p-4">
+                            <h5 class="text-center border-bottom">Exercises</h5>
+                            <div class="row">
+                                <div class="col-12" id="exercises-in-workout">
+                                    <p class="text-center">No exercises selected</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 </div>
 {% endblock content %}
