@@ -4,4 +4,4 @@ from .models import Workout
 class WorkoutForm(forms.ModelForm):
     class Meta:
         model = Workout
-        fields = '__all__'
+        fields = ['name', 'notes']
