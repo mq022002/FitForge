@@ -68,7 +68,7 @@ def image_search(query):
                 if link.get('src'):
                     max_width = width
                     largest = link.get('src')
-    return {'image': largest}
+    return largest
 
 def fetch_exercise_image(query):
     try:
@@ -137,27 +137,10 @@ def fetch_youtube_link(query):
         }
         return youtube
     else:
+        print(req.json())
         print("fetch_youtube_link api Error", req.status_code)
         return None
-    """
-    url = f"http://127.0.0.1:3000/youtube?q={query}"
-    req = requests.get(url)
-    if req.status_code == 200:
-        response = req.json()
-        if len(response['videos']) > 0:
-            video = response['videos'][0]
-            youtube = {
-                'title': video['title'],
-                'id': video['id'],
-                'thumbnail': video['thumbnail']
-            }
-            return youtube
-        else:
-            return None
-    else:
-        print("Youtube search api error: ", req.status_code)
-        return None
-    """
+
 
 if __name__ == '__main__':
     print(fetch_youtube_link("test"))
