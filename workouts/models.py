@@ -27,11 +27,17 @@ class Workout(models.Model):
         for exercise in exercises_in_workout:
             exercise_detail = exercise.exercise_id
             details['exercises'].append({
-                'name': exercise_detail.name,
+                'name': exercise_detail.name.title().replace('_', ' '),
+                'type': exercise_detail.type.title().replace('_', ' '),
+                'muscle': exercise_detail.muscle.title().replace('_', ' '),
+                'equipment': exercise_detail.equipment.title().replace('_', ' '),
+                'difficulty': exercise_detail.difficulty.title().replace('_', ' '),
+                'instructions': exercise_detail.instructions,
                 'sets': exercise.sets,
                 'reps': exercise.reps,
                 'weight': exercise.weight,
-                'exercise_notes': exercise.notes
+                'exercise_notes': exercise.notes,
+                'id': exercise.id
             })
         return details
 

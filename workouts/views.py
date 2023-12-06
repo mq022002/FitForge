@@ -7,8 +7,7 @@ from .models import *
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .forms import WorkoutForm
-from django.http import HttpResponse
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.db import transaction, IntegrityError
 # Create your views here.
 
@@ -144,7 +143,8 @@ def workout(request, workout_name):
     user_id = request.user.id
     workout_id = get_object_or_404(Workout, name=workout_name, user=user_id).id
     workout = ExerciseInWorkout.objects.filter(workout_id=workout_id)
-    context = { 'workout': workout }
+    workout_details = workout.get_workout_details()
+    context = { 'workout': workout_details }
     return render(request, 'workouts/workout.html', context=context)
 
 
@@ -187,4 +187,55 @@ def delete_workout(request, id):
     if request.method == 'POST':
         workout.delete()
         # after deleting redirect to view_product page
-    return redirect('workouts')
+    return redirect('read_workouts')
+
+
+def view_workout(request, id):
+    # make id 0-indexed
+    id -= 1
+    if id < 0:
+        raise Http404("Workout does not exist")
+
+    workouts = list(Workout.objects.filter(user=request.user.id))
+    print('workouts: ', workouts)
+    try:
+        workout = workouts[id].get_workout_details()
+        for exercise in workout['exercises']:
+            exercise['youtube'] = api.fetch_youtube_link(exercise['name'] + " tutorial")
+        #for exercise in workout['exercises']:
+        #    exercise['image'] = api.fetch_exercise_image(exercise['name'])
+        print('workout: ', workout)
+    except:
+        print("Workout does not exist")
+        raise Http404("Workout does not exist")
+
+    context = { 'workout': workout }
+    return render(request, 'workouts/workout.html', context=context)
+
+
+@login_required
+def delete_exercise_from_workout(request):
+    if request.method == 'POST':
+        exercise_id = request.POST.get('id', None)  
+        exercise = ExerciseInWorkout.objects.get(id=exercise_id)
+        
+        workout_id = exercise.workout_id.id
+        user = request.user.id
+        # check if workout belongs to user
+        workout = Workout.objects.get(id=workout_id, user=user)
+        if workout:
+            exercise.delete()
+            return JsonResponse({'success': True, 'workout_id': workout_id})
+        
+        return JsonResponse({'success': False, 'workout_id': workout_id})
+
+def error_404(request, *args, **kwargs):
+    response = render(request, '404.html')
+    response.status_code = 404
+    return response
+
+
+def error_500(request, *args, **kwargs):
+    response = render(request, '404.html')
+    response.status_code = 500
+    return response
