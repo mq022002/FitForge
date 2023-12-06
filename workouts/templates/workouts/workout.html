@@ -1,7 +1,102 @@
 {% extends "base.html" %}
 {% block content %}
-{{ workout }}
-{% for w in workout %}
-    {{ w.exercise }}
-{% endfor %}
+<style>
+    .fixed-width {
+        width: 25%;
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        $(".details").click(function() {
+            if ($(this).attr("aria-expanded") == "true") {
+                $(this).html("Less Details");
+            } else {
+                $(this).html("More Details");
+            }
+        });
+
+        $('.delete').click(function() {
+            let id = $(this).data('id');
+            console.log("id", id);
+            $.ajax({
+                url: '{% url "delete_exercise" %}',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    id: id
+                },
+                success: function(response) {
+                    location.reload();
+                }
+            });
+        })
+    });
+</script>
+<div class="main-container container bg-light rounded shadow-lg p-4">
+    <h1 class="text-center display-3">Workout Viewer</h1>
+    <hr>
+    <div class="row">
+        <h1 class="bold">{{workout.name}}</h1>
+        <p><b>Notes:</b> {{workout.notes}}</p>
+        <div>
+        {% for exercise in workout.exercises %}
+            <div class="card mb-4 shadow">
+                <div class="card-body">
+                    <h5 class="card-title text-center">{{exercise.name}}</h5>
+                    <hr>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="fixed-width">Sets</th>
+                                <th scope="col" class="fixed-width">Reps</th>
+                                <th scope="col" class="fixed-width">Weight</th>
+                                <th scope="col">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fs-5">{{ exercise.sets }}</td>
+                                <td class="fs-5">{{ exercise.reps }}</td>
+                                <td class="fs-5">{{ exercise.weight }}</td>
+                                <td class="fs-5">{{ exercise.notes }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-between mb-1">
+                        <div class="btn btn-outline-primary justify-content-center w-100 details" data-bs-toggle="collapse" href="#collapse{{exercise.id}}" role="button" aria-expanded="false" aria-controls="collapse{{exercise.id}}" id="{{exercise.id}}">
+                            More Details
+                        </div>
+                        <div class="ms-1">
+                            <button type="submit" class="btn btn-danger delete" data-id="{{exercise.id}}"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="collapse" id="collapse{{exercise.id}}">
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card-body">
+                                    <p class="card-text"><b>Type: </b>{{ exercise.type }}</p>
+                                    <p class="card-text"><b>Muscle: </b>{{ exercise.muscle }}</p>
+                                    <p class="card-text"><b>Equipment: </b>{{ exercise.equipment }}</p>
+                                    <p class="card-text"><b>Difficulty: </b>{{ exercise.difficulty }}</p>   
+                                </div>    
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card-body">
+                                    <p><b>Instructions:</b>{{exercise.instructions}}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="embed-responsive embed-responsive-16by9">
+                                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{exercise.youtube.id}}" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>    
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock content %}
