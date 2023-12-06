@@ -4,3 +4,5 @@ venv/
 __pycache__
 .vscode/
 db.sqlite3
+static/admin
+static/django-browser-reload
