@@ -19,7 +19,6 @@ Exercises
         });
         
 
-
         $('#exercises-form').submit(function(event) {
             event.preventDefault();
             $.ajax({
@@ -41,28 +40,12 @@ Exercises
             })
         });
 
+        // When selecting which workout to add to
         $('#workout-selector').on('change', (event) => {
-            $.ajax({
-                type: 'POST',
-                url: '{% url "read_workout" %}',
-                data: {
-                    'csrfmiddlewaretoken': window.CSRF_TOKEN,
-                    'workout_id': event.target.value
-                },
-                success: function(data) {
-                    $('#exercises').empty();
-                    const workout = data.workout
-                    for (let exercise of workout.exercises) {
-                        $('#exercises').append(
-                            `<div class='border text-center lead bg-white rounded p-1 my-1'>
-                                ${exercise.name}
-                            </div>`
-                        )
-                    }
-                }
-            })
+            readExercisesInWorkout();
         });
 
+        // When submitting the form to add an exercise to a workout
         $('#add-exercise-to-workout').click(function() {
             console.log("adding exercise to workout");
 
@@ -90,16 +73,38 @@ Exercises
                     'workout_id': workout_id
                 },
                 success: function(data) {
-                    console.log("success " + data);
+                    readExercisesInWorkout();
                 }
             })
         });
     });
     
+    // When clicking on any add button in each row of the exercises table
     $(document).on('click', '.add-exercise', function() {
         selectedExercise = $(this).data('exercise');
     });
 
+    function readExercisesInWorkout(){
+        $.ajax({
+            type: 'POST',
+            url: '{% url "read_workout" %}',
+            data: {
+                'csrfmiddlewaretoken': window.CSRF_TOKEN,
+                'workout_id': $('#workout-selector').val()
+            },
+            success: function(data) {
+                const workout = data.workout;
+                $('#exercises-in-workout').empty();
+                for (let exercise of workout.exercises) {
+                    $('#exercises-in-workout').append(
+                        `<div class='border text-center lead bg-white rounded p-1 my-1 fs-6'>
+                            ${exercise.name}
+                        </div>`
+                    )
+                }
+            }
+        });
+    }
 
     function updateExercisesTable(exercises) {
         var tableBody = $('#exercises-table tbody');
@@ -149,7 +154,7 @@ Exercises
                     <div class="col">
                         <div class="mb-3 text-center lead">
                             <label for="weight" class="form-label">Weight</label>
-                            <input type="number" class="form-control" id="weight" placeholder="0" min="0">
+                            <input type="number" class="form-control" id="weight" placeholder="0" min="0" value="0">
                         </div>
                     </div>
                 </div>
@@ -165,13 +170,13 @@ Exercises
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button id="add-exercise-to-workout" type="button" class="btn btn-primary">Add to Workout</button>
+          <button id="add-exercise-to-workout" type="button" class="btn btn-primary" data-bs-dismiss="modal">Add to Workout</button>
         </div>
       </div>
     </div>
 </div>
 
-<div class="container-fluid">
+<div class="container-fluid main-container">
     <h2>Search for Exercises</h2>
     <div class="row">
         <div class="col-md-10">
@@ -225,53 +230,6 @@ Exercises
         </div>
 
         <div class="border rounded shadow mb-5">
-    {% comment %} 
-            <div class="p-4">
-                <div class="accordion" id="accordionExample">
-                    {% for exercise in exercises %}
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter0 }}" aria-expanded="true" aria-controls="collapse{{ forloop.counter0 }}">
-                                <div class="row">
-                                    <div class="col">
-                                        {{ exercise.name | title }}
-                                    </div>
-                                    <div class="col">
-                                        {{ exercise.type | title }}
-                                    </div>
-                                    <div class="col">
-                                        {{ exercise.muscle | title | spacify:"_" }}
-                                    </div>
-                                    <div class="col">
-                                        <div class="{% if exercise.difficulty == 'beginner' %}
-                                            bg-success
-                                        {% elif exercise.difficulty == 'intermediate' %}
-                                            bg-warning
-                                        {% else %}
-                                            bg-danger
-                                        {% endif %} text-white p-1 rounded-3">
-                                            <p class="text-center">
-                                                {{ exercise.difficulty | title | spacify:"_" }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        {{ exercise.equipment | title | spacify:"_" }}
-                                    </div>
-                                </div>
-                            </button>
-                        </h2>
-                        <div id="collapse{{ forloop.counter0 }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <strong>Instructions: </strong> {{ exercise.instructions }}
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endcomment %}
-
             <div class="p-4">
                 <table class="table table-hover" id="exercises-table">
                     <thead>
@@ -291,7 +249,7 @@ Exercises
         </div>
     </div>
     <div class="col-md-2">
-        <div class="bg-light border shadow rounded px-2 py-3">
+        <div class="bg-light border shadow rounded px-2 py-3 sticky-top">
             <h2 class="text-center">Workout</h2>
             <select id="workout-selector" class="form-select" aria-label="Workout Select">
                 <option selected disabled>Select a workout</option>
@@ -304,7 +262,7 @@ Exercises
                     <div class="p-4">
                         <h5 class="text-center border-bottom">Exercises</h5>
                         <div class="row">
-                            <div class="col-12" id="exercises">
+                            <div class="col-12" id="exercises-in-workout">
                                 <p class="text-center">No exercises selected</p>
                             </div>
                         </div>

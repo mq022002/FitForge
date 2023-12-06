@@ -27,44 +27,6 @@ def exercises(request):
     for workout in workouts:
         workout_list.append({'id': workout.id, 'name': workout.name})
 
-    #     elif 'add_exercise' in request.POST:
-    #         exercise = request.POST.get('exercise', None)
-    #         exercise_parameters = request.POST.get('exercise_parameters', None)
-    #         workout_id = request.POST.get('workout_id', None)
-    #         # if exercise doesn't exist in db, add it
-    #         if not Exercise.objects.filter(name=exercise['name']).exists():
-    #             exercise_insert = Exercise(
-    #                 name=exercise['name'], 
-    #                 type=exercise['type'],
-    #                 muscle=exercise['muscle'],
-    #                 equipment=exercise['equipment'],
-    #                 difficulty=exercise['difficulty'],
-    #                 instructions=exercise['instructions']
-    #             )
-    #             exercise_insert.save()
-    #         # add exercise to workout
-    #         exercise_id = Exercise.objects.get(name=exercise['name']).id
-    #         exercise_in_workout = ExerciseInWorkout(
-    #             exercise_id=exercise_id,
-    #             workout_id=workout_id,
-    #             sets=exercise_parameters['sets'],
-    #             reps=exercise_parameters['reps'],
-    #             weight=exercise_parameters['weight'],
-    #             notes=exercise_parameters['notes']
-    #         )
-    #         exercise_in_workout.save()
-    #         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
-            #return render(request, 'exercises/exercises.html', {'exercises': exercise_list, 'workouts': workout_list})
-        # Remove backslashes from exercise names
-        # To prevent errors in routes
-        # for exercise in exercise_list:
-        #     exercise['name'] = exercise['name'].replace('/', ' ')
-        #     exercise['equipment'] = exercise['equipment'].replace('_', ' ').capitalize()
-        #     exercise['muscle'] = exercise['muscle'].replace('_', ' ').capitalize()
-        #     exercise['type'] = exercise['type'].replace('_', ' ').capitalize()
-        #     exercise['difficulty'] = exercise['difficulty'].capitalize()
-    
-
     context = {
         'muscles': muscle_list,
         'types': type_list,
@@ -92,12 +54,7 @@ def read_exercises(request):
         exercises = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=api_pages_to_return, offset=offset)
 
         # Process exercises to remove underscores from keys
-        for exercise in exercises:
-            exercise['name'] = exercise['name'].title().replace('_', ' ')
-            exercise['muscle'] = exercise['muscle'].title().replace('_', ' ')
-            exercise['type'] = exercise['type'].title().replace('_', ' ')
-            exercise['equipment'] = exercise['equipment'].title().replace('_', ' ')
-            exercise['difficulty'] = exercise['difficulty'].title().replace('_', ' ')
+
         # Process exercises to remove underscores from keys and capitalize them
 
         # for i, exercise in enumerate(exercises):
@@ -109,15 +66,11 @@ def read_exercises(request):
 
 def read_workout(request):
     if request.method == 'POST':
-        print("reading workout")
-        # workout_id = request.POST.get('workout_id', None)
-        # workout_exercises = _workout_exercises(workout_id, request.user.id)
-        # return JsonResponse({'exercises': workout_exercises})
         workout_id = request.POST.get('workout_id', None)
         user_id = request.user.id
+        print(user_id, workout_id)
         workout = Workout.objects.get(id=workout_id, user=user_id)
-        workout_details = workout.get_workout_details();
-        print(workout_details)
+        workout_details = workout.get_workout_details()
         return JsonResponse({'workout': workout_details})
 
 
@@ -201,17 +154,17 @@ def workouts(request):
     context = { 'workouts': workouts }
     return render(request, 'workouts/workouts.html', context=context)
 
-
 @login_required
 def create_workout(request):
     # Create a form instance and populate it with data from the request
     form = WorkoutForm(request.POST or None)
+    
     if request.method == 'POST':
         if form.is_valid():
-            print("valid")
-            form.save()
-            # return redirect('workouts')
-            return redirect('read_workouts')
+            workout = form.save(commit=False)
+            workout.user = request.user.userprofile  # Set the user from the currently authenticated user
+            workout.save()
+            return redirect('workouts')
     # if the request does not have post data, a blank form will be rendered
     return render(request, 'workouts/workout-form.html', {'form': form})
 
