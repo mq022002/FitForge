@@ -10,6 +10,7 @@
     <script src="https://kit.fontawesome.com/019cfea9d3.js" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
     {% load static %}
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}" >
     <link rel="stylesheet" href="{% static 'css/base.css' %}" />
     {% block head %}
 
@@ -19,7 +20,10 @@
     {% with current_page=request.resolver_match.url_name %}
       <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3 shadow">
         <div class="container">
-          <a class="navbar-brand" href="{% url 'home' %}">FitForge</a>
+          <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="{% static 'images/FitForge_Logo.png' %}" width="30" height="30" alt="">
+            FitForge
+          </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
