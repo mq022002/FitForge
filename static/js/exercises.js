@@ -55,11 +55,11 @@ $(document).ready(function() {
                 'exercise_equipment': selectedExercise.equipment,
                 'exercise_difficulty': selectedExercise.difficulty,
                 'exercise_instructions': selectedExercise.instructions,
-                'sets': $('#sets').val(),
-                'reps': $('#reps').val(),
-                'weight': $('#weight').val(),
+                'sets': sets,
+                'reps': reps,
+                'weight': weight,
                 'rest_time': 5,
-                'notes': $('#notes').val(),
+                'notes': notes,
                 'workout_id': workout_id
             },
             success: function(data) {
