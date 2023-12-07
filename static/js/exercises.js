@@ -106,8 +106,15 @@ function updateExercisesTable(exercises) {
         row.append($('<td id="exercise-type"></td>').text(exercise.type));
         row.append($('<td></td>').text(exercise.equipment));
         row.append($('<td></td>').text(exercise.difficulty));
-        const addButton = $('<button class="btn btn-primary add-exercise" data-bs-toggle="modal" data-bs-target="#exerciseModal">Add</button>');
+        const addButton = $('<button class="btn btn-primary add-exercise"">Add</button>');//data-bs-toggle="modal" data-bs-target="#exerciseModal
         addButton.data('exercise', exercise); // Attach the entire exercise object
+        // Add click event to add exercise button to not open the modal if no workout selected
+        addButton.click(function(e) {
+            let workout = $('#workout-selector option:selected');
+            if (!workout.is(':disabled')) {
+                $('#exerciseModal').modal('toggle');
+            }
+        });
         row.append($('<td></td>').append(addButton));
         // Add collapsible instructions
         tableBody.append(row);
