@@ -121,19 +121,23 @@ def add_exercise(request):
 
 
 def exercise_detail(request, exercise_name):
-    exercise = api.get_exercises(name=exercise_name)[0]
-    video = api.fetch_youtube_link(exercise['name'])
-    if(video):
-        url = "https://www.youtube.com/embed/" + video['id']
-        context = {
-            'exercise': exercise,
-            'url': url
-        }
-    else:
-        context = {
-            'exercise': exercise,
-        }
-
+    try:
+        exercise = api.get_exercises(name=exercise_name)[0]
+        video = api.fetch_youtube_link(exercise['name'])
+        if(video):
+            url = "https://www.youtube.com/embed/" + video['id']
+            context = {
+                'exercise': exercise,
+                'url': url
+            }
+        else:
+            context = {
+                'exercise': exercise,
+            }
+    except Exception as e:
+        print(f"Error in exercise_detail: {e}")
+        raise Http404("Invalid exercise search")
+    
     return render(request, 'exercises/exercise_detail.html', context)
 
     
