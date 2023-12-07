@@ -74,7 +74,7 @@ Exercises
     <div class="row">
         {% if user.is_authenticated %}
             <div class="col-lg-2 order-lg-2">
-                <div class="bg-light border shadow rounded px-2 py-3 me-4 sticky-top">
+                <div class="bg-light border shadow rounded px-2 py-3 me-lg-2 mb-4 sticky-top">
                     <h2 class="text-center">Workout</h2>
                     <select id="workout-selector" class="form-select" aria-label="Workout Select">
                         <option selected disabled>Select a workout</option>
@@ -149,14 +149,14 @@ Exercises
 
         <div class="border rounded shadow mb-5 d-none" id="exercises">
             <div class="p-4">
-                <table class="table table-hover" id="exercises-table">
+                <table class="table table-hover table-hover" id="exercises-table">
                     <thead>
                         <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Muscle</th>
-                            <th scope="col">Type</th>
-                            <th scope="col">Equipment</th>
-                            <th scope="col">Difficulty</th>
+                            <th scope="col" class="col-2">Name</th>
+                            <th scope="col" class="col-2">Muscle</th>
+                            <th scope="col" class="col-2">Type</th>
+                            <th scope="col" class="col-2">Equipment</th>
+                            <th scope="col" class="col-2">Difficulty</th>
                         </tr>
                     </thead>
                     <tbody>

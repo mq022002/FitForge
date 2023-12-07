@@ -100,7 +100,7 @@ function updateExercisesTable(exercises) {
     var tableBody = $('#exercises-table tbody');
     tableBody.empty(); // Clear current table body
     $.each(exercises, function(i, exercise) {
-        const row = $('<tr></tr>');
+        const row = $(`<tr data-bs-toggle="collapse" data-bs-target="#collapse${i}" aria-expanded="false" aria-controls="collapse${i}"></tr>`);
         row.append($('<td id="exercise-name"></td>').text(exercise.name));
         row.append($('<td id="exercise-muscle"></td>').text(exercise.muscle));
         row.append($('<td id="exercise-type"></td>').text(exercise.type));
@@ -109,6 +109,11 @@ function updateExercisesTable(exercises) {
         const addButton = $('<button class="btn btn-primary add-exercise" data-bs-toggle="modal" data-bs-target="#exerciseModal">Add</button>');
         addButton.data('exercise', exercise); // Attach the entire exercise object
         row.append($('<td></td>').append(addButton));
+        // Add collapsible instructions
         tableBody.append(row);
+
+        const collapseRow = $(`<tr class="collapse" id="collapse${i}"><td colspan="6"><b>Instructions:</b> ${exercise.instructions}</td></tr>`);
+        tableBody.append(collapseRow);
+
     });
 }
