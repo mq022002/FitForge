@@ -39,6 +39,7 @@ def exercises(request):
 def read_exercises(request):
     if request.method == 'POST':
         # Use the .get() method with a default value of None
+        # Filters
         selected_muscle = request.POST.get('muscle', None)
         selected_type = request.POST.get('type', None)
         selected_difficulty = request.POST.get('difficulty', None)
@@ -52,14 +53,13 @@ def read_exercises(request):
 
         # API call
         exercises = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=api_pages_to_return, offset=offset)
-
-        # Process exercises to remove underscores from keys
-
         # Process exercises to remove underscores from keys and capitalize them
-
-        # for i, exercise in enumerate(exercises):
-        #     formatted_exercise = {key.replace('_', ' ').title(): value for key, value in exercise.items()}
-        #     exercises[i] = formatted_exercise
+        for exercise in exercises:
+            exercise['name'] = exercise['name'].replace('_', ' ').title()
+            exercise['type'] = exercise['type'].replace('_', ' ').title()
+            exercise['muscle'] = exercise['muscle'].replace('_', ' ').title()
+            exercise['equipment'] = exercise['equipment'].replace('_', ' ').title()
+            exercise['difficulty'] = exercise['difficulty'].replace('_', ' ').title()
 
         return JsonResponse({'exercises': exercises})
 
