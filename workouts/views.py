@@ -177,7 +177,7 @@ def update_workout(request, id):
         # update the record in the db
         form.save()
     
-    return redirect('read_workouts')
+    return redirect('workouts')
     
 @login_required
 def delete_workout(request, id):
@@ -187,7 +187,7 @@ def delete_workout(request, id):
     if request.method == 'POST':
         workout.delete()
         # after deleting redirect to view_product page
-    return redirect('read_workouts')
+    return redirect('workouts')
 
 
 def view_workout(request, id):
