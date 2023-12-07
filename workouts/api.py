@@ -44,7 +44,15 @@ def get_exercises(name=None, muscle=None, e_type=None, difficulty=None, images=F
     for result in results:
         if result:
             exercises.extend(result)
-    #print(exercises)
+
+    # Process exercises to remove underscores from keys and capitalize them
+    for exercise in exercises:
+        exercise['name'] = exercise['name'].replace('_', ' ').title()
+        exercise['type'] = exercise['type'].replace('_', ' ').title()
+        exercise['muscle'] = exercise['muscle'].replace('_', ' ').title()
+        exercise['equipment'] = exercise['equipment'].replace('_', ' ').title()
+        exercise['difficulty'] = exercise['difficulty'].replace('_', ' ').title()
+        
     return exercises
 
     

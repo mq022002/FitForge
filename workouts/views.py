@@ -53,13 +53,7 @@ def read_exercises(request):
 
         # API call
         exercises = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=api_pages_to_return, offset=offset)
-        # Process exercises to remove underscores from keys and capitalize them
-        for exercise in exercises:
-            exercise['name'] = exercise['name'].replace('_', ' ').title()
-            exercise['type'] = exercise['type'].replace('_', ' ').title()
-            exercise['muscle'] = exercise['muscle'].replace('_', ' ').title()
-            exercise['equipment'] = exercise['equipment'].replace('_', ' ').title()
-            exercise['difficulty'] = exercise['difficulty'].replace('_', ' ').title()
+
 
         return JsonResponse({'exercises': exercises})
 
