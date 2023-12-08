@@ -229,12 +229,14 @@ def delete_exercise_from_workout(request):
     
 
 def error_404(request, *args, **kwargs):
-    response = render(request, '404.html')
+    context = {"error": "404"}
+    response = render(request, 'error.html', context=context)
     response.status_code = 404
     return response
 
 
 def error_500(request, *args, **kwargs):
-    response = render(request, '404.html')
+    context = {"error": "500"}
+    response = render(request, 'error.html', context=context)
     response.status_code = 500
     return response
