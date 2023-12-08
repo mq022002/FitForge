@@ -11,7 +11,7 @@ $(document).ready(function() {
         let id = $(this).data('id');
         console.log("id", id);
         $.ajax({
-            url: DeleteExerciseURL,
+            url: deleteExerciseURL,
             type: 'POST',
             data: {
                 'csrfmiddlewaretoken': CSRFToken,
