@@ -119,8 +119,8 @@ function updateExercisesTable(exercises) {
                 $('#workout-error').toggleClass('d-none');
             }
         });
-
-        if(isAuthenticated === true) {
+        console.log(isAuthenticated);
+        if(isAuthenticated === 'True') {
             console.log("code running");
             row.append($('<td></td>').append(addButton));
         }
