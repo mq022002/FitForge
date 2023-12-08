@@ -2,13 +2,13 @@ from typing import Any
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from . import api
-from django.views.generic import ListView, DetailView, TemplateView
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .forms import WorkoutForm
 from django.http import HttpResponse, JsonResponse, Http404
 from django.db import transaction, IntegrityError
+from .forms import ExerciseForm
 # Create your views here.
 
 def home(request):
@@ -16,23 +16,23 @@ def home(request):
     context = {'name': 'John'}
     return render(request, 'home.html', context)
 
-# Only responsible for grabbing information that should be shown when the page loads
-def exercises(request):
-    type_list = api.exercise_types
-    muscle_list = api.exercise_muscles
-    difficulty_list = api.exercise_difficulties
-
-    workouts = Workout.objects.filter(user=request.user.id)
-    workout_list = []
-    for workout in workouts:
-        workout_list.append({'id': workout.id, 'name': workout.name})
-
+def view_exercises(request):
+    filterform = ExerciseForm(request.POST or None)
+    workouts = Workout.objects.filter(user=request.user.userprofile)
     context = {
-        'muscles': muscle_list,
-        'types': type_list,
-        'difficulties': difficulty_list,
-        'workout_list': workout_list
+        'filterform': filterform,
+        'workouts': workouts,
     }
+    if request.method == 'POST':
+        if filterform.is_valid():
+            # Call the API with the selected options
+            selected_muscle = filterform.cleaned_data['muscle_group']
+            selected_type = filterform.cleaned_data['exercise_type']
+            selected_difficulty = filterform.cleaned_data['difficulty']
+
+            exercises = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty)
+            context['exercises'] = exercises
+
     return render(request, 'exercises/exercises.html', context)
 
 

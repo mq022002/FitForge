@@ -42,15 +42,7 @@ class Workout(models.Model):
         return details
 
     def __str__(self):
-        workout_info = f"Workout Name: {self.name}, Notes: {self.notes}"
-        exercises_in_workout = ExerciseInWorkout.objects.filter(workout_id=self)
-
-        exercises_info = []
-        for exercise in exercises_in_workout:
-            exercise_detail = exercise.exercise_id
-            exercises_info.append(f"Exercise: {exercise_detail.name}, Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight}, Notes: {exercise.notes}")
-
-        return workout_info + "\n" + "\n".join(exercises_info)
+        return self.name
 
 
 class ExerciseInWorkout(models.Model):
