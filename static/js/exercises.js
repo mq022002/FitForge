@@ -97,8 +97,9 @@ function readExercisesInWorkout(){
 }
 
 function updateExercisesTable(exercises) {
-    var tableBody = $('#exercises-table tbody');
+    const tableBody = $('#exercises-table tbody');
     tableBody.empty(); // Clear current table body
+
     $.each(exercises, function(i, exercise) {
         const row = $(`<tr data-bs-toggle="collapse" data-bs-target="#collapse${i}" aria-expanded="false" aria-controls="collapse${i}"></tr>`);
         row.append($('<td id="exercise-name"></td>').text(exercise.name));
@@ -106,7 +107,7 @@ function updateExercisesTable(exercises) {
         row.append($('<td id="exercise-type"></td>').text(exercise.type));
         row.append($('<td></td>').text(exercise.equipment));
         row.append($('<td></td>').text(exercise.difficulty));
-        const addButton = $('<button class="btn btn-primary add-exercise"">Add</button>');//data-bs-toggle="modal" data-bs-target="#exerciseModal
+        const addButton = $('<button class="btn btn-primary add-exercise"">Add</button>');
         addButton.data('exercise', exercise); // Attach the entire exercise object
         // Add click event to add exercise button to not open the modal if no workout selected
         addButton.click(function(e) {
@@ -118,7 +119,12 @@ function updateExercisesTable(exercises) {
                 $('#workout-error').toggleClass('d-none');
             }
         });
-        row.append($('<td></td>').append(addButton));
+
+        if(isAuthenticated === true) {
+            console.log("code running");
+            row.append($('<td></td>').append(addButton));
+        }
+        
         // Add collapsible instructions
         tableBody.append(row);
 

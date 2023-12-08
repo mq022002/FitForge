@@ -39,19 +39,18 @@ def change_password(request):
     return render(request, 'registration/password_change.html', {'form': form})
 
 def user_login(request):
-    if request.user.is_authenticated:
-        return redirect('profile')
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request=request, username=username, password=password)
-        if user is not None:
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            # get the user info from the form data and log in the user
+            user = form.get_user()
             login(request, user)
             return redirect('profile')
-        else:
-            return render(request, 'registration/login.html', {"error": "Incorrect Username or Password"})
     else:
-        return render(request, 'registration/login.html')
+        form = AuthenticationForm()
+        
+    return render(request, 'registration/login.html', {'form': form})
+
     
 def register(request):
     form = UserCreateForm(request.POST or None)

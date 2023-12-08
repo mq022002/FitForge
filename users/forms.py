@@ -19,13 +19,6 @@ class UserCreateForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'age', 'gender', 'password1', 'password2']
 
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': "Username"}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': "Email"}),
-            'age': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': "Age"}),
-            'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': "Password"}),
-            'password2': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': "Confirm Password"}),
-        }
         
     def save(self, commit=True):
         user = super().save(commit=False)

@@ -14,6 +14,7 @@ Exercises
     const addExercisesUrl = '{% url "add_exercise" %}'
     const readWorkoutUrl = "{% url 'read_workout' %}"
     const readExercisesUrl = "{% url 'read_exercises' %}"
+    const isAuthenticated = "{{ user.is_authenticated }}"
 </script>
 <script src="{% static 'js/exercises.js' %}"></script>
 {% endblock scripts %}
