@@ -114,7 +114,9 @@ function updateExercisesTable(exercises) {
             let workout = $('#workout-selector option:selected');
             if (!workout.is(':disabled')) {
                 $('#exerciseModal').modal('toggle');
-                $('#workout-error').toggleClass('d-none');
+                if (!$('#workout-error').hasClass('d-none')) {
+                    $('#workout-error').toggleClass('d-none');
+                }
             } else {
                 $('#workout-error').toggleClass('d-none');
             }
