@@ -105,8 +105,8 @@ function updateExercisesTable(exercises) {
         row.append($('<td id="exercise-name"></td>').text(exercise.name));
         row.append($('<td id="exercise-muscle"></td>').text(exercise.muscle));
         row.append($('<td id="exercise-type"></td>').text(exercise.type));
-        row.append($('<td></td>').text(exercise.equipment));
-        row.append($('<td></td>').text(exercise.difficulty));
+        row.append($('<td class="d-none d-md-table-cell"></td>').text(exercise.equipment));
+        row.append($('<td class="d-none d-md-table-cell"></td>').text(exercise.difficulty));
         const addButton = $('<button class="btn btn-primary add-exercise"">Add</button>');
         addButton.data('exercise', exercise); // Attach the entire exercise object
         // Add click event to add exercise button to not open the modal if no workout selected
@@ -128,8 +128,20 @@ function updateExercisesTable(exercises) {
         // Add collapsible instructions
         tableBody.append(row);
 
-        const collapseRow = $(`<tr class="collapse" id="collapse${i}"><td colspan="6"><b>Instructions:</b> ${exercise.instructions}</td></tr>`);
+        const collapseRow = $(
+            `<tr class="collapse d-md-none" id="collapse${i}">
+                <td colspan="3">
+                    <b>Equipment:</b> ${exercise.equipment}
+                </td>
+                <td colspan="3">
+                    <b>Difficulty:</b> ${exercise.difficulty}
+                </td>
+            </tr>
+            <tr class="collapse" id="collapse${i}">
+                <td colspan="6">
+                    <b>Instructions:</b> ${exercise.instructions}
+                </td>
+            </tr>`);
         tableBody.append(collapseRow);
-
     });
 }
