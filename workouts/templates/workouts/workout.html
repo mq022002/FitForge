@@ -6,32 +6,11 @@
     }
 </style>
 <script>
-    $(document).ready(function() {
-        $(".details").click(function() {
-            if ($(this).attr("aria-expanded") == "true") {
-                $(this).html("Less Details");
-            } else {
-                $(this).html("More Details");
-            }
-        });
-
-        $('.delete').click(function() {
-            let id = $(this).data('id');
-            console.log("id", id);
-            $.ajax({
-                url: '{% url "delete_exercise" %}',
-                type: 'POST',
-                data: {
-                    'csrfmiddlewaretoken': '{{ csrf_token }}',
-                    id: id
-                },
-                success: function(response) {
-                    location.reload();
-                }
-            });
-        })
-    });
+    CSRFToken = '{{ csrf_token }}';
+    DeleteExerciseURL = '{% url "delete_exercise" %}';
 </script>
+{% load static %}
+<script src="{% static 'js/workout.js' %}"></script>
 <div class="main-container container bg-light rounded shadow-lg p-4">
     <h1 class="text-center display-3">Workout Viewer</h1>
     <hr>
