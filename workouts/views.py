@@ -223,9 +223,10 @@ def delete_exercise_from_workout(request):
         workout = Workout.objects.get(id=workout_id, user=user)
         if workout:
             exercise.delete()
-            return JsonResponse({'success': True, 'workout_id': workout_id})
+            return HttpResponse(status=200)
         
-        return JsonResponse({'success': False, 'workout_id': workout_id})
+    return HttpResponse(status=400)
+    
 
 def error_404(request, *args, **kwargs):
     response = render(request, '404.html')
