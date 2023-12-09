@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib import messages
-from .forms import UserProfileForm
-from .forms import UserCreateForm
+from .forms import UserProfileForm, UserCreateForm
 from django.contrib.auth import update_session_auth_hash
 from .models import UserProfile
+from django.http import JsonResponse
 
 # Create your views here.
 @login_required
@@ -60,3 +61,13 @@ def register(request):
             login(request, user)
             return redirect('profile')
     return render(request, 'registration/register.html', {'form': form})
+
+
+@require_POST
+def toggle_dark_mode(request):
+    if request.session.get('dark_mode', False):
+        request.session['dark_mode'] = False
+    else:
+        request.session['dark_mode'] = True
+    #return JsonResponse({'dark_mode': request.session['dark_mode']})
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
