@@ -7,6 +7,8 @@ $(document).ready(function() {
     // When submitting the form to add an exercise to a workout
     $('#add-exercise-to-workout').click(function() {
         console.log("adding exercise to workout");
+        // Retrieve the data-exercise-id attribute
+        const selectedExercise = $(this).data('exercise');
 
         const workout_id = $('#workout-selector').val();
         const sets = $('#sets').val();

@@ -5,33 +5,6 @@
         width: 25%;
     }
 </style>
-<script>
-    $(document).ready(function() {
-        $(".details").click(function() {
-            if ($(this).attr("aria-expanded") == "true") {
-                $(this).html("Less Details");
-            } else {
-                $(this).html("More Details");
-            }
-        });
-
-        $('.delete').click(function() {
-            let id = $(this).data('id');
-            console.log("id", id);
-            $.ajax({
-                url: '{% url "delete_exercise" %}',
-                type: 'POST',
-                data: {
-                    'csrfmiddlewaretoken': '{{ csrf_token }}',
-                    id: id
-                },
-                success: function(response) {
-                    location.reload();
-                }
-            });
-        })
-    });
-</script>
 <div class="main-container container bg-light rounded shadow-lg p-4">
     <h1 class="text-center display-3">Workout Viewer</h1>
     <hr>
@@ -39,7 +12,7 @@
         <h1 class="bold">{{workout.name}}</h1>
         <p><b>Notes:</b> {{workout.notes}}</p>
         <div>
-        {% for exercise in workout.exercises %}
+        {% for exercise in exercises %}
             <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title text-center">{{exercise.name}}</h5>
@@ -67,7 +40,10 @@
                             More Details
                         </div>
                         <div class="ms-1">
-                            <button type="submit" class="btn btn-danger delete" data-id="{{exercise.id}}"><i class="fa-solid fa-trash"></i></button>
+                            <form method="post" action="{% url 'delete_exercise_in_workout' exercise.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger delete"><i class="fa-solid fa-trash"></i></button>
+                            </form>
                         </div>
                     </div>
                     <div class="collapse" id="collapse{{exercise.id}}">
@@ -83,7 +59,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="card-body">
-                                    <p><b>Instructions: </b>{{exercise.instructions}}</p>
+                                    <p><b>Instructions: </b>{{ exercise.instructions }}</p>
                                 </div>
                             </div>
                             <div class="col-md-4">

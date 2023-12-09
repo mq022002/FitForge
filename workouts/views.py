@@ -8,7 +8,8 @@ from django.views.decorators.http import require_POST
 from .forms import WorkoutForm
 from django.http import HttpResponse, JsonResponse, Http404
 from django.db import transaction, IntegrityError
-from .forms import ExerciseForm
+from .forms import ExerciseFilterForm, ExerciseInWorkoutForm
+import json
 # Create your views here.
 
 def home(request):
@@ -17,12 +18,14 @@ def home(request):
     return render(request, 'home.html', context)
 
 def view_exercises(request):
-    filterform = ExerciseForm(request.POST or None)
-    workouts = Workout.objects.filter(user=request.user.userprofile)
+    filterform = ExerciseFilterForm(request.POST or None)
+    exerciseinworkoutform = ExerciseInWorkoutForm(request.POST or None)
+
     context = {
         'filterform': filterform,
-        'workouts': workouts,
+        'exerciseinworkoutform': exerciseinworkoutform
     }
+
     if request.method == 'POST':
         if filterform.is_valid():
             # Call the API with the selected options
@@ -32,9 +35,12 @@ def view_exercises(request):
 
             exercises = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty)
             context['exercises'] = exercises
-
+        
     return render(request, 'exercises/exercises.html', context)
 
+def read_workouts(request):
+    workouts = Workout.objects.filter(user=request.user.userprofile)
+    return JsonResponse({'workouts': workouts})
 
 def read_exercises(request):
     if request.method == 'POST':
@@ -68,71 +74,41 @@ def read_workout(request):
         return JsonResponse({'workout': workout_details})
 
 
-def add_exercise(request):
+def create_exercise_in_workout(request, exercise_name):
+    form = ExerciseInWorkoutForm(request.POST or None)
+    context = {
+        'form': form,
+        'exercise_name': exercise_name
+    }
     if request.method == 'POST':
-        try:
-            exercise_name = request.POST.get('exercise_name')
-            exercise_type = request.POST.get('exercise_type')
-            exercise_muscle = request.POST.get('exercise_muscle')
-            exercise_equipment = request.POST.get('exercise_equipment')
-            exercise_difficulty = request.POST.get('exercise_difficulty')
-            exercise_instructions = request.POST.get('exercise_instructions')
-            sets = request.POST.get('sets')
-            reps = request.POST.get('reps')
-            weight = request.POST.get('weight')
-            notes = request.POST.get('notes')
-            workout_id = request.POST.get('workout_id')
-            # makes sure both db inserts are successful
-            with transaction.atomic():
-                # if exercise doesn't exist in db, add it
-                if not Exercise.objects.filter(name=exercise_name).exists():
-                    exercise_insert = Exercise(
-                        name=exercise_name, 
-                        type=exercise_type,
-                        muscle=exercise_muscle,
-                        equipment=exercise_equipment,
-                        difficulty=exercise_difficulty,
-                        instructions=exercise_instructions
-                    )
-                    exercise_insert.save()
-                # add exercise to workout
-                exercise = Exercise.objects.get(name=exercise_name)
-                workout = Workout.objects.get(id=workout_id)
-                exercise_in_workout = ExerciseInWorkout(
-                    exercise_id=exercise,
-                    workout_id=workout,
-                    sets=sets,
-                    reps=reps,
-                    weight=weight,
-                    notes=notes
-                )
-                exercise_in_workout.save()
-        except IntegrityError:
-            # if there is an error, return a bad request
-            return HttpResponse(status=400)
-        # return a success response
-        return HttpResponse(status=200)
+        if form.is_valid():
+            exercise_in_workout = form.save(commit=False)
+            exercise_in_workout.name = exercise_name
+            exercise_in_workout.save()
+            return redirect('exercises')
+
+    return render(request, 'exercises/create_exercise_in_workout.html', context)
 
 
-def exercise_detail(request, exercise_name):
-    try:
-        exercise = api.get_exercises(name=exercise_name)[0]
-        video = api.fetch_youtube_link(exercise['name'])
-        if(video):
-            url = "https://www.youtube.com/embed/" + video['id']
-            context = {
-                'exercise': exercise,
-                'url': url
-            }
-        else:
-            context = {
-                'exercise': exercise,
-            }
-    except Exception as e:
-        print(f"Error in exercise_detail: {e}")
-        raise Http404("Invalid exercise search")
+# def exercise_detail(request, exercise_name):
+#     try:
+#         exercise = api.get_exercises(name=exercise_name)[0]
+#         video = api.fetch_youtube_link(exercise['name'])
+#         if(video):
+#             url = "https://www.youtube.com/embed/" + video['id']
+#             context = {
+#                 'exercise': exercise,
+#                 'url': url
+#             }
+#         else:
+#             context = {
+#                 'exercise': exercise,
+#             }
+#     except Exception as e:
+#         print(f"Error in exercise_detail: {e}")
+#         raise Http404("Invalid exercise search")
     
-    return render(request, 'exercises/exercise_detail.html', context)
+#     return render(request, 'exercises/exercise_detail.html', context)
 
     
 @login_required
@@ -197,35 +173,41 @@ def view_workout(request, id):
     workouts = list(Workout.objects.filter(user=request.user.id))
     print('workouts: ', workouts)
     try:
-        workout = workouts[id].get_workout_details()
-        for exercise in workout['exercises']:
-            exercise['youtube'] = api.fetch_youtube_link(exercise['name'] + " tutorial")
-        #for exercise in workout['exercises']:
-        #    exercise['image'] = api.fetch_exercise_image(exercise['name'])
-        print('workout: ', workout)
-    except:
-        print("Workout does not exist")
-        raise Http404("Workout does not exist")
+        workout = workouts[id]
+        exercises_in_workout = ExerciseInWorkout.objects.filter(workout=workout)
 
-    context = { 'workout': workout }
+        for exercise in exercises_in_workout:
+            exercise_detail = api.get_exercises(name=exercise.name)[0]
+            exercise.type = exercise_detail['type']
+            exercise.equipment = exercise_detail['equipment']
+            exercise.muscle = exercise_detail['muscle']
+            exercise.difficulty = exercise_detail['difficulty']
+            exercise.instructions = exercise_detail['instructions']
+            exercise.youtube = api.fetch_youtube_link(exercise.name + " tutorial")
+
+    except Exception as e:
+        print(e)
+        raise Http404("Workout does not exist")
+    
+    context = {
+        'workout': workout,
+        'exercises': exercises_in_workout
+    }
     return render(request, 'workouts/workout.html', context=context)
 
 
 @login_required
-def delete_exercise_from_workout(request):
+def delete_exercise_in_workout(request, id):
     if request.method == 'POST':
-        exercise_id = request.POST.get('id', None)  
-        exercise = ExerciseInWorkout.objects.get(id=exercise_id)
-        
-        workout_id = exercise.workout_id.id
+        exercise = ExerciseInWorkout.objects.get(id=id)
+        workout_id = exercise.workout.id
         user = request.user.id
         # check if workout belongs to user
         workout = Workout.objects.get(id=workout_id, user=user)
         if workout:
             exercise.delete()
-            return JsonResponse({'success': True, 'workout_id': workout_id})
-        
-        return JsonResponse({'success': False, 'workout_id': workout_id})
+
+    return redirect('view_workout', workout_id)
 
 def error_404(request, *args, **kwargs):
     response = render(request, '404.html')

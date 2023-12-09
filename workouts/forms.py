@@ -1,7 +1,8 @@
 from django import forms
-from .models import Workout
+from .models import Workout, ExerciseInWorkout
 
 EXERCISE_MUSCLE_GROUP_CHOICES = [
+    ('', 'Select Muscle'),  # Empty option
     ('abdominals', 'Abdominals'),
     ('abductors', 'Abductors'),
     ('adductors', 'Adductors'),
@@ -21,10 +22,11 @@ EXERCISE_MUSCLE_GROUP_CHOICES = [
 ]
 
 EXERCISE_TYPE_CHOICES = {
-    "": "None",
+    
     # "cardio": "Cardio",
     # "olympic_weightlifting": "Olympic Weightlifting",
     # "plyometrics": "Plyometrics",
+    '': 'Select Type',
     "powerlifting": "Powerlifting",
     "strength": "Strength",
     "stretching": "Stretching",
@@ -33,16 +35,22 @@ EXERCISE_TYPE_CHOICES = {
 
 
 EXERCISE_DIFFICULTY_CHOICES = {
-    "": "None",
+    '': 'Select Difficulty',
     "beginner": "Beginner",
     "intermediate": "Intermediate",
     "expert": "Expert"
 }
 
-class ExerciseForm(forms.Form):
-    muscle_group = forms.ChoiceField(choices=EXERCISE_MUSCLE_GROUP_CHOICES, label="Muscle Group")
-    exercise_type = forms.ChoiceField(choices=[(k, v) for k, v in EXERCISE_TYPE_CHOICES.items()], label="Exercise Type")
-    difficulty = forms.ChoiceField(choices=[(k, v) for k, v in EXERCISE_DIFFICULTY_CHOICES.items()], label="Difficulty")
+class ExerciseFilterForm(forms.Form):
+    muscle_group = forms.ChoiceField(choices=EXERCISE_MUSCLE_GROUP_CHOICES, required=False, label="Muscle Group")
+    exercise_type = forms.ChoiceField(choices=[(k, v) for k, v in EXERCISE_TYPE_CHOICES.items()], required=False, label="Exercise Type")
+    difficulty = forms.ChoiceField(choices=[(k, v) for k, v in EXERCISE_DIFFICULTY_CHOICES.items()], required=False, label="Difficulty")
+
+class ExerciseInWorkoutForm(forms.ModelForm):
+    class Meta:
+        model = ExerciseInWorkout
+        fields = '__all__'
+        exclude = ('name',)
 
 class WorkoutForm(forms.ModelForm):
     class Meta:
