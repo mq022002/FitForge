@@ -1,22 +1,11 @@
 {% extends "base.html" %}
 
-{% load static %}
 {% load crispy_forms_tags %}
 {% load workouts_extras %}
 
 {% block title %}
 Exercises
 {% endblock title %}
-
-{% block scripts %}
-{% comment %} <script>
-    const CSRFToken = '{{csrf_token}}'
-    const readWorkoutUrl = "{% url 'read_workout' %}"
-    const readExercisesUrl = "{% url 'read_exercises' %}"
-    const isAuthenticated = "{{ user.is_authenticated }}"
-</script>
-<script src="{% static 'js/exercises.js' %}"></script> {% endcomment %}
-{% endblock scripts %}
 
 {% block content %}
 
@@ -71,30 +60,5 @@ Exercises
         </div>
     </div>
 </div>
-
-<!-- Exercise modal -->
-{% comment %} <div class="modal fade" id="exerciseModal" tabindex="-1" aria-labelledby="exerciseModalLabel" aria-hidden="true">
-    <div class="modal-dialog  modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exerciseModalLabel">Add Exercise</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <h5 class="text-center">Exercise Name</h5>
-            <form action="{% url 'create_exercise_in_workout'  %}" method="POST">
-                {% csrf_token %}
-                {{ exerciseinworkoutform | crispy }}
-                <button type="submit" name="exercise_form" class="btn btn-primary" id="submit-form">Submit</button>
-            </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button id="add-exercise-to-workout" type="button" class="btn btn-primary" data-bs-dismiss="modal">Add to Workout</button>
-        </div>
-      </div>
-    </div>
-</div> {% endcomment %}
-
 
 {% endblock content %}

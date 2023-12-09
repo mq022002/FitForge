@@ -38,31 +38,6 @@ def view_exercises(request):
         
     return render(request, 'exercises/exercises.html', context)
 
-def read_workouts(request):
-    workouts = Workout.objects.filter(user=request.user.userprofile)
-    return JsonResponse({'workouts': workouts})
-
-def read_exercises(request):
-    if request.method == 'POST':
-        # Use the .get() method with a default value of None
-        # Filters
-        selected_muscle = request.POST.get('muscle', None)
-        selected_type = request.POST.get('type', None)
-        selected_difficulty = request.POST.get('difficulty', None)
-        page = request.POST.get('page', 0)
-
-        # how many pages to fetch from api (page = 10 results)
-        api_pages_to_return = 3
-
-        # offset from api = page from request * 10 * pages to return from api
-        offset = page * api_pages_to_return * 10
-
-        # API call
-        exercises = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=api_pages_to_return, offset=offset)
-
-
-        return JsonResponse({'exercises': exercises})
-
 
 def read_workout(request):
     if request.method == 'POST':
@@ -74,41 +49,7 @@ def read_workout(request):
         return JsonResponse({'workout': workout_details})
 
 
-def create_exercise_in_workout(request, exercise_name):
-    form = ExerciseInWorkoutForm(request.POST or None)
-    context = {
-        'form': form,
-        'exercise_name': exercise_name
-    }
-    if request.method == 'POST':
-        if form.is_valid():
-            exercise_in_workout = form.save(commit=False)
-            exercise_in_workout.name = exercise_name
-            exercise_in_workout.save()
-            return redirect('exercises')
 
-    return render(request, 'exercises/create_exercise_in_workout.html', context)
-
-
-# def exercise_detail(request, exercise_name):
-#     try:
-#         exercise = api.get_exercises(name=exercise_name)[0]
-#         video = api.fetch_youtube_link(exercise['name'])
-#         if(video):
-#             url = "https://www.youtube.com/embed/" + video['id']
-#             context = {
-#                 'exercise': exercise,
-#                 'url': url
-#             }
-#         else:
-#             context = {
-#                 'exercise': exercise,
-#             }
-#     except Exception as e:
-#         print(f"Error in exercise_detail: {e}")
-#         raise Http404("Invalid exercise search")
-    
-#     return render(request, 'exercises/exercise_detail.html', context)
 
     
 @login_required
@@ -163,7 +104,7 @@ def delete_workout(request, id):
         # after deleting redirect to view_product page
     return redirect('workouts')
 
-
+@login_required
 def view_workout(request, id):
     # make id 0-indexed
     id -= 1
@@ -208,6 +149,23 @@ def delete_exercise_in_workout(request, id):
             exercise.delete()
 
     return redirect('view_workout', workout_id)
+
+@login_required
+def create_exercise_in_workout(request, exercise_name):
+    form = ExerciseInWorkoutForm(request.POST or None, user=request.user)
+    context = {
+        'form': form,
+        'exercise_name': exercise_name
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            exercise_in_workout = form.save(commit=False)
+            exercise_in_workout.name = exercise_name
+            exercise_in_workout.save()
+            return redirect('exercises')
+
+    return render(request, 'exercises/create_exercise_in_workout.html', context)
+
 
 def error_404(request, *args, **kwargs):
     response = render(request, '404.html')

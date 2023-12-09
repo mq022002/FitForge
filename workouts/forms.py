@@ -46,13 +46,19 @@ class ExerciseFilterForm(forms.Form):
     exercise_type = forms.ChoiceField(choices=[(k, v) for k, v in EXERCISE_TYPE_CHOICES.items()], required=False, label="Exercise Type")
     difficulty = forms.ChoiceField(choices=[(k, v) for k, v in EXERCISE_DIFFICULTY_CHOICES.items()], required=False, label="Difficulty")
 
+class WorkoutForm(forms.ModelForm):
+    class Meta:
+        model = Workout
+        fields = ['name', 'notes']
+
 class ExerciseInWorkoutForm(forms.ModelForm):
     class Meta:
         model = ExerciseInWorkout
         fields = '__all__'
         exclude = ('name',)
 
-class WorkoutForm(forms.ModelForm):
-    class Meta:
-        model = Workout
-        fields = ['name', 'notes']
+    def __init__(self, *args, **kwargs):
+            user = kwargs.pop('user', None)
+            super(ExerciseInWorkoutForm, self).__init__(*args, **kwargs)
+            if user is not None:
+                self.fields['workout'].queryset = Workout.objects.filter(user__user=user)
