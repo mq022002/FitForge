@@ -17,7 +17,7 @@
                 <div class="card-body">
                     <h5 class="card-title text-center">{{exercise.name}}</h5>
                     <hr>
-                    <table class="table">
+                    <table class="table text-center">
                         <thead>
                             <tr>
                                 <th scope="col" class="fixed-width">Sets</th>
@@ -49,25 +49,41 @@
                     <div class="collapse" id="collapse{{exercise.id}}">
                         <hr>
                         <div class="row">
-                            <div class="col-md-4">
-                                <div class="card-body">
-                                    <p class="card-text"><b>Type: </b>{{ exercise.type }}</p>
-                                    <p class="card-text"><b>Muscle: </b>{{ exercise.muscle }}</p>
-                                    <p class="card-text"><b>Equipment: </b>{{ exercise.equipment }}</p>
-                                    <p class="card-text"><b>Difficulty: </b>{{ exercise.difficulty }}</p>   
-                                </div>    
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card-body">
-                                    <p><b>Instructions: </b>{{ exercise.instructions }}</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="embed-responsive embed-responsive-16by9">
-                                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{exercise.youtube.id}}" allowfullscreen></iframe>
-                                </div>
-                            </div>
+                            <table class="table text-center">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="fixed-width">Type</th>
+                                        <th scope="col" class="fixed-width">Muscle</th>
+                                        <th scope="col" class="fixed-width">Equipment</th>
+                                        <th scope="col" class="fixed-width">Difficulty</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fs-5">{{ exercise.type }}</td>
+                                        <td class="fs-5">{{ exercise.muscle}}</td>
+                                        <td class="fs-5">{{ exercise.equipment }}</td>
+                                        <td class="fs-5">{{ exercise.difficulty  }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
+                        <!--<div class="row">
+                            <div class="col-12">
+                                
+                            </div>
+                        </div>-->
+                        <div class="card-body">
+                            <p><b>Instructions: </b>{{ exercise.instructions }}</p>
+                        </div>
+                        <div class="ratio ratio-16x9">
+                            <iframe src="https://www.youtube.com/embed/{{exercise.youtube.id}}" title="YouTube video" allowfullscreen></iframe>
+                        </div>
+                        <!--<<div class="row">
+                            <div class="col-12">
+                                
+                            </div>
+                        </div>-->
                         
                     </div>    
                 </div>
