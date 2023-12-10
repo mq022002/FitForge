@@ -24,13 +24,16 @@
         {% endif %}
          mb-3 shadow">
         <div class="container">
-          <a class="navbar-brand" href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'home' %}{% endif %}">
+          <a class="navbar-brand" href="{% url 'home' %}">
             <img src="{% static 'images/FitForge_Logo.png' %}" width="30" height="30" alt="">
             FitForge
           </a>        
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link {% if current_page == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+              </li>
               {% if user.is_authenticated %}
                 <li class="nav-item">
                   <a class="nav-link {% if current_page == 'workouts' %}active{% endif %}" href="{% url 'workouts' %}">Workouts</a>
@@ -83,9 +86,9 @@
           </div>
           <div class="col-md-4 py-2 text-center text-md-start d-flex flex-column">
             <h4>Contact</h4>
-            <a class="fs-4" href="mailto:fitforge@polandmail.com"><i class="fa-solid fa-envelope icon-color"></i></a>
-            <a class="fs-4" href="tel:2034790526"><i class="fa-solid fa-phone icon-color"></i></a>
-            <a class="fs-4" href="https://github.com/mq022002/FitForge"><i class="fa-brands fa-github icon-color"></i></a>
+            <a class="fs-4" href="mailto:fitforge@polandmail.com"><i class="fas fa-envelope icon-color"></i></a>
+            <a class="fs-4" href="tel:2034790526"><i class="fas fa-phone icon-color"></i></a>
+            <a class="fs-4" href="https://github.com/mq022002/FitForge"><i class="fab fa-github icon-color"></i></a>
           </div>          
         </div>
         <hr>
