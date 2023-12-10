@@ -13,8 +13,8 @@ import json
 # Create your views here.
 
 def home(request):
-    # return HttpResponse("Hello, Django!")
-    context = {'name': 'John'}
+    user_count = User.objects.count()  # Get the count of users
+    context = {'user_count': user_count}
     return render(request, 'home.html', context)
 
 def view_exercises(request):
@@ -71,17 +71,21 @@ def workouts(request):
 
 @login_required
 def create_workout(request):
-    # Create a form instance and populate it with data from the request
     form = WorkoutForm(request.POST or None)
+    user_profile = request.user.userprofile
     
     if request.method == 'POST':
         if form.is_valid():
             workout = form.save(commit=False)
-            workout.user = request.user.userprofile  # Set the user from the currently authenticated user
+            workout.user = request.user.userprofile 
             workout.save()
             return redirect('workouts')
-    # if the request does not have post data, a blank form will be rendered
-    return render(request, 'workouts/workout-form.html', {'form': form})
+        
+    context = {
+        'form': form,
+        'user_profile': user_profile,
+    }
+    return render(request, 'workouts/workout-form.html', context)
 
 @login_required
 def update_workout(request, id):
@@ -167,13 +171,16 @@ def create_exercise_in_workout(request, exercise_name):
     return render(request, 'exercises/create_exercise_in_workout.html', context)
 
 
+
 def error_404(request, *args, **kwargs):
-    response = render(request, '404.html')
+    context = {"error": "404"}
+    response = render(request, 'error.html', context=context)
     response.status_code = 404
     return response
 
 
 def error_500(request, *args, **kwargs):
-    response = render(request, '404.html')
+    context = {"error": "500"}
+    response = render(request, 'error.html', context=context)
     response.status_code = 500
     return response
