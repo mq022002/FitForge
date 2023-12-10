@@ -10,12 +10,13 @@ from django.http import HttpResponse, JsonResponse, Http404
 from django.db import transaction, IntegrityError
 from .forms import ExerciseFilterForm, ExerciseInWorkoutForm
 import json
+from django.contrib.auth.models import User
 # Create your views here.
 
 def home(request):
-    # user_count = User.objects.count()  # Get the count of users
-    # context = {'user_count': user_count}
-    return render(request, 'home.html')
+    user_count = User.objects.count()
+    context = {'user_count': user_count}
+    return render(request, 'home.html', context)
 
 def view_exercises(request):
     filterform = ExerciseFilterForm(request.POST or None)
