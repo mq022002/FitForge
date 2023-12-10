@@ -24,7 +24,7 @@
         {% endif %}
          mb-3 shadow">
         <div class="container">
-          <a class="navbar-brand" href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'home' %}{% endif %}">
+          <a class="navbar-brand" href="{% url 'home' %}">
             <img src="{% static 'images/FitForge_Logo.png' %}" width="30" height="30" alt="">
             FitForge
           </a>        
