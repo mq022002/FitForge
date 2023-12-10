@@ -77,7 +77,9 @@
           </div>
           <div class="col-md-4 py-2 text-center text-md-start d-flex flex-column">
             <h4>FitForge</h4>
-            <p><a class="text-decoration-none text-muted" href="{% url 'workouts' %}">Workouts</a></p>
+            {% if user.is_authenticated %}
+              <p><a class="text-decoration-none text-muted" href="{% url 'workouts' %}">Workouts</a></p>
+            {% endif %}
             <p><a class="text-decoration-none text-muted" href="{% url 'exercises' %}">Exercises</a></p>
             <p><a class="text-decoration-none text-muted" href="{% url 'profile' %}">Profile</a></p>
           </div>
