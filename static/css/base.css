@@ -10,3 +10,7 @@
 .main-container {
     min-height: calc(100vh - 60px);
 }
+
+.icon-color{
+    color: rgb(51, 201, 208);
+}
