@@ -12,7 +12,12 @@ FitForge
         <div class="col-md-4 text-center text-md-start align-self-center order-md-first">
             <h1 class="display-1 text-decoration-underline">FitForge</h1>
             <p class="lead">The Fitness Application for<br>Health Enthusiasts with 'Time Under Tension'</p>
+        {% if user.is_authenticated %}
+            <a class="btn btn-outline-primary" href="{% url 'profile' %}"><i class="fas fa-user"></i> View your profile!</a>
+        {% else %}
             <a class="btn btn-outline-primary" href="{% url 'login' %}"><i class="fas fa-running"></i> Get Started NOW!</a>
+        {% endif %}
+        
         </div>
         <div class="col-md-8 d-flex justify-content-center order-first">
             <img src="{% static 'images/undraw_fitness_stats.svg' %}" class="img-fluid" alt="Health Enthusiast with Time Under Tension">
