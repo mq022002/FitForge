@@ -6,8 +6,29 @@ Home Page
 
 {% block content %}
 <div class="container">
-    <h2>Welcome to the Home Page!</h2>
-    <p>This is the main content of the home page.</p>
-    <!-- More HTML content can go here -->
+    <div class="row pt-5">
+        <div class="col-md-4 text-center text-md-start align-self-center order-md-first">
+            <h1 class="display-1 text-decoration-underline">FitForge</h1>
+            <p class="lead">The Fitness Application for<br>Health Enthusiasts with 'Time Under Tension'</p>
+            <a class="btn btn-outline-primary" href="{% url 'login' %}"><i class="fas fa-running"></i> Get Started NOW!</a>
+        </div>
+        <div class="col-md-8 d-flex justify-content-center order-first">
+            <img src="static/images/undraw_fitness_stats.svg" class="img-fluid" alt"Health Enthusiast with Time Under Tension">
+        </div>
+    </div>
+    <div class="row pt-2 pb-5">
+        <div class="col-4 text-center align-self-center">
+            <h1>{{ user_count }}</h1>
+            <p>Users Using FitForge</p>
+        </div>
+        <div class="col-4 text-center align-self-center">
+            <h1>6+</h1>
+            <p>Filterable Exercise Types</p>
+        </div>
+        <div class="col-4 text-center align-self-center">
+            <h1>15+</h1>
+            <p>Filterable Muscle Groups</p>
+        </div>
+    </div>
 </div>
 {% endblock content %}
