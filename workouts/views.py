@@ -110,9 +110,15 @@ def delete_workout(request, id):
     return redirect('workouts')
 
 @login_required
-def view_workout(request, id):
+def view_workout(request, workout_id):
+     # make id 0-indexed
+    workout_id -= 1
+    if workout_id < 0:
+        raise Http404()
+
+    workouts = list(Workout.objects.filter(user=request.user.id))
     try:
-        workout = Workout.objects.get(id=id, user=request.user.id)
+        workout = workouts[workout_id]
         exercises_in_workout = ExerciseInWorkout.objects.filter(workout=workout)
 
         for exercise in exercises_in_workout:
@@ -126,7 +132,7 @@ def view_workout(request, id):
 
     except Exception as e:
         print(e)
-        raise Http404("Workout does not exist")
+        raise Http404()
     
     context = {
         'workout': workout,
@@ -136,17 +142,19 @@ def view_workout(request, id):
 
 
 @login_required
-def delete_exercise_in_workout(request, id):
+def delete_exercise_in_workout(request, workout_id):
     if request.method == 'POST':
-        exercise = ExerciseInWorkout.objects.get(id=id)
+        exercise = ExerciseInWorkout.objects.get(id=workout_id)
         workout_id = exercise.workout.id
         user = request.user.id
         # check if workout belongs to user
         workout = Workout.objects.get(id=workout_id, user=user)
         if workout:
             exercise.delete()
-
-    return redirect('view_workout', workout_id)
+        workouts = list(Workout.objects.filter(user=request.user.id))
+        workout_index = workouts.index(workout) + 1
+        print(workout_index)
+    return redirect('view_workout', workout_index)
 
 @login_required
 def create_exercise_in_workout(request, exercise_name):
