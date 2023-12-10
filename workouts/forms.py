@@ -42,9 +42,10 @@ EXERCISE_DIFFICULTY_CHOICES = {
 }
 
 class ExerciseFilterForm(forms.Form):
-    muscle_group = forms.ChoiceField(choices=EXERCISE_MUSCLE_GROUP_CHOICES, required=False, label="Muscle Group")
+    exercise_name = forms.CharField(required=False, label="Exercise Name", widget=forms.TextInput(attrs={'placeholder': 'Search by name'}))
+    exercise_muscle_group = forms.ChoiceField(choices=EXERCISE_MUSCLE_GROUP_CHOICES, required=False, label="Muscle Group")
     exercise_type = forms.ChoiceField(choices=[(k, v) for k, v in EXERCISE_TYPE_CHOICES.items()], required=False, label="Exercise Type")
-    difficulty = forms.ChoiceField(choices=[(k, v) for k, v in EXERCISE_DIFFICULTY_CHOICES.items()], required=False, label="Difficulty")
+    exercise_difficulty = forms.ChoiceField(choices=[(k, v) for k, v in EXERCISE_DIFFICULTY_CHOICES.items()], required=False, label="Difficulty")
 
 class WorkoutForm(forms.ModelForm):
     class Meta:

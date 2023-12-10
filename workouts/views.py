@@ -13,9 +13,9 @@ import json
 # Create your views here.
 
 def home(request):
-    user_count = User.objects.count()  # Get the count of users
-    context = {'user_count': user_count}
-    return render(request, 'home.html', context)
+    # user_count = User.objects.count()  # Get the count of users
+    # context = {'user_count': user_count}
+    return render(request, 'home.html')
 
 def view_exercises(request):
     filterform = ExerciseFilterForm(request.POST or None)
@@ -29,11 +29,12 @@ def view_exercises(request):
     if request.method == 'POST':
         if filterform.is_valid():
             # Call the API with the selected options
-            selected_muscle = filterform.cleaned_data['muscle_group']
+            search = filterform.cleaned_data['exercise_name']
+            selected_muscle = filterform.cleaned_data['exercise_muscle_group']
             selected_type = filterform.cleaned_data['exercise_type']
-            selected_difficulty = filterform.cleaned_data['difficulty']
+            selected_difficulty = filterform.cleaned_data['exercise_difficulty']
 
-            exercises = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty)
+            exercises = api.get_exercises(name=search, muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty)
             context['exercises'] = exercises
         
     return render(request, 'exercises/exercises.html', context)
@@ -110,15 +111,8 @@ def delete_workout(request, id):
 
 @login_required
 def view_workout(request, id):
-    # make id 0-indexed
-    id -= 1
-    if id < 0:
-        raise Http404("Workout does not exist")
-
-    workouts = list(Workout.objects.filter(user=request.user.id))
-    print('workouts: ', workouts)
     try:
-        workout = workouts[id]
+        workout = Workout.objects.get(id=id, user=request.user.id)
         exercises_in_workout = ExerciseInWorkout.objects.filter(workout=workout)
 
         for exercise in exercises_in_workout:
