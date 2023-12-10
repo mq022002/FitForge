@@ -8,4 +8,5 @@ urlpatterns = [
     path("accounts/register/", views.register, name="register"),
     path("profile/", views.profile, name="profile"),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('toggle_dark_mode/', views.toggle_dark_mode, name='toggle_dark_mode'),
 ]
