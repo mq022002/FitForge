@@ -5,7 +5,7 @@
         width: 25%;
     }
 </style>
-<div class="main-container container bg-light rounded shadow-lg p-4">
+<div class="main-container container {% if request.session.dark_mode == False %} bg-light {% endif %} rounded shadow-lg p-4">
     <h1 class="text-center display-3">Workout Viewer</h1>
     <hr>
     <div class="row">
