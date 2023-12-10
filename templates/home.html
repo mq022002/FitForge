@@ -1,7 +1,9 @@
 {% extends "base.html" %}
+{% load static %}
+
 
 {% block title %}
-Home Page
+FitForge
 {% endblock title %}
 
 {% block content %}
@@ -13,7 +15,7 @@ Home Page
             <a class="btn btn-outline-primary" href="{% url 'login' %}"><i class="fas fa-running"></i> Get Started NOW!</a>
         </div>
         <div class="col-md-8 d-flex justify-content-center order-first">
-            <img src="static/images/undraw_fitness_stats.svg" class="img-fluid" alt"Health Enthusiast with Time Under Tension">
+            <img src="{% static 'images/undraw_fitness_stats.svg' %}" class="img-fluid" alt="Health Enthusiast with Time Under Tension">
         </div>
     </div>
     <div class="row pt-2 pb-5">
