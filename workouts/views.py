@@ -9,11 +9,12 @@ from django.views.decorators.http import require_POST
 from .forms import WorkoutForm
 from django.http import HttpResponse, JsonResponse, Http404
 from django.db import transaction, IntegrityError
+from django.contrib.auth.models import User
 # Create your views here.
 
 def home(request):
-    # return HttpResponse("Hello, Django!")
-    context = {'name': 'John'}
+    user_count = User.objects.count()  # Get the count of users
+    context = {'user_count': user_count}
     return render(request, 'home.html', context)
 
 # Only responsible for grabbing information that should be shown when the page loads
@@ -154,17 +155,21 @@ def workouts(request):
 
 @login_required
 def create_workout(request):
-    # Create a form instance and populate it with data from the request
     form = WorkoutForm(request.POST or None)
+    user_profile = request.user.userprofile
     
     if request.method == 'POST':
         if form.is_valid():
             workout = form.save(commit=False)
-            workout.user = request.user.userprofile  # Set the user from the currently authenticated user
+            workout.user = request.user.userprofile 
             workout.save()
             return redirect('workouts')
-    # if the request does not have post data, a blank form will be rendered
-    return render(request, 'workouts/workout-form.html', {'form': form})
+        
+    context = {
+        'form': form,
+        'user_profile': user_profile,
+    }
+    return render(request, 'workouts/workout-form.html', context)
 
 @login_required
 def update_workout(request, id):
