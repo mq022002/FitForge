@@ -4,18 +4,18 @@
         <title>Error</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
-        <script src="https://kit.fontawesome.com/019cfea9d3.js" crossorigin="anonymous"></script>
-        {% load static %}
+        <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css' rel='stylesheet' type='text/css'>
+	{% load static %}
         <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}" >
     </head>
     <body>
         <div class="container">
             <div class="row">
                 <div class="col-12 text-center mt-5">
-                    <h1 class="display-2 m-0">{{ error }}</h1>
-                    <img class="img-fluid w-25" src="{% static 'images/error.png' %}" alt="404" />
-                    <h2>Page not found</h2>
-                    <a class="btn btn-outline-primary mt-2" href="{% url 'home' %}"><i class="fas fa-arrow-left"></i> Go to Home</a>
+			<h1 class="display-3">{{ error }}</h1>
+			<p class="lead">How'd you end up here?</p>
+		    <img class="img-fluid d-block m-auto rounded w-25 mt-4" src="{% static 'images/bruh.gif' %}" alt="404" />
+		    <a class="btn btn-outline-primary mt-5" href="{% url 'home' %}"><i class="fas fa-arrow-left"></i> Go Home</a>
                 </div>
             </div>
     </body>
