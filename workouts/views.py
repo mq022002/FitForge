@@ -26,26 +26,7 @@ def view_exercises(request):
         'filterform': filterform,
         'exerciseinworkoutform': exerciseinworkoutform
     }
-    """
-    if request.method == 'GET':
-        search = request.GET.get('search', None)
-        selected_muscle = request.GET.get('muscle', None)
-        selected_type = request.GET.get('type', None)
-        selected_difficulty = request.GET.get('difficulty', None)
-        page = int(request.GET.get('page', 1))
-        if page < 1:
-            page = 1
-        offset = (page - 1) * 10
-        exercises = api.get_exercises(name=search, muscle=selected_muscle, e_type=selected_type, pages=1, offset=offset)
-        
-        context['exercises'] = exercises
-        context['parameters'] = {
-                'search': search,
-                'muscle': selected_muscle,
-                'type': selected_type,
-                'difficulty': selected_difficulty
-            }
-        """
+
     if request.method == 'POST':
         if 'pagination' in request.POST:
             # Call the API with the selected options
