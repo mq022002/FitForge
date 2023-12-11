@@ -6,10 +6,7 @@
 {% endblock %}
 
 {% block content %}
-Fitness goal: {{ user_profile.fitness_goal }}
-<br>
-Focused muscle groups: {{ user_profile.focused_muscle_groups }}
-<div class="container" data-fitness-goal="{{ user_profile.fitness_goal }}"> 
+<div class="container"> 
     <h1 class="display-4">Create a Workout</h1>
     <form method="post" action="{% url 'create_workout' %}">
         {% csrf_token %}
