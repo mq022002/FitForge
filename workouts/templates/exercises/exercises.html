@@ -10,51 +10,73 @@ Exercises
 {% block content %}
 
 <div class="container-fluid main-container">
-    <h2 class="display-4 text-center">Search for Exercises</h2>
-    <div class="border rounded shadow mb-5">
-        <div class="p-4">
-            <form action="{% url 'exercises' %}" method="POST">
-                {% csrf_token %}
-                {{ filterform | crispy }}
-                <button type="submit" name="exercise_form" class="btn btn-primary" id="submit-form">Submit</button>
-            </form>
-        </div>
+    <div class="row">
+        <h2 class="display-4">Search for Exercises</h2>
     </div>
-    <div class="border rounded shadow mb-5">
-        <div class="p-4">
-            {% if exercises %}
-            <table class="table table-hover table-striped"  id="exercises-table">
-                <thead>
-                    <tr>
-                        <th scope="col" class="col-2">Name</th>
-                        <th scope="col" class="col-2">Muscle</th>
-                        <th scope="col" class="col-2">Type</th>
-                        <th scope="col" class="col-2">Equipment</th>
-                        <th scope="col" class="col-2">Difficulty</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for exercise in exercises %}
-                        <tr>
-                            <td>{{ exercise.name }}</td>
-                            <td>{{ exercise.muscle }}</td>
-                            <td>{{ exercise.type }}</td>
-                            <td>{{ exercise.equipment }}</td>
-                            <td>{{ exercise.difficulty }}</td>
-                            <td>
-                                <form method="post" action="{% url 'create_exercise_in_workout' exercise.name %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-success">Add</button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p>Please submit to see exercises!</p>
-            {% endif %}
+    <div class="row">
+        <div class="col-md-3">
+            <div class="border rounded shadow mb-5 sticky-top">
+                <div class="p-4">
+                    <form action="{% url 'exercises' %}" method="POST">
+                        {% csrf_token %}
+                        {{ filterform | crispy }}
+                        <button type="submit" name="exercise_form" class="btn btn-primary" id="submit-form">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="border rounded shadow mb-5">
+                <div class="p-4">
+                    {% if exercises %}
+                    <table class="table table-hover table-striped"  id="exercises-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="col-2 col-md-3">Name</th>
+                                <th scope="col" class="col-2 col-md-3">Muscle</th>
+                                <th scope="col" class="col-2 col-md-3">Type</th>
+                                <th scope="col" class="col-2 d-none d-lg-table-cell">Equipment</th>
+                                <th scope="col" class="col-2 d-none d-lg-table-cell">Difficulty</th>
+                                <th scope="col" class="col-2 col-md-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for exercise in exercises %}
+                                <tr data-bs-toggle="collapse" data-bs-target="#collapse{{forloop.counter}}" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
+                                    <td>{{ exercise.name }}</td>
+                                    <td>{{ exercise.muscle }}</td>
+                                    <td>{{ exercise.type }}</td>
+                                    <td class="d-none d-lg-table-cell">{{ exercise.equipment }}</td>
+                                    <td class="d-none d-lg-table-cell">{{ exercise.difficulty }}</td>
+                                    <td class="ps-5">
+                                        <form method="post" action="{% url 'create_exercise_in_workout' exercise.name %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-success">Add</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <tr class="collapse d-md-none" id="collapse{{forloop.counter}}">
+                                    <td colspan="3">
+                                        <b>Equipment:</b> {{exercise.equipment}}
+                                    </td>
+                                    <td colspan="3">
+                                        <b>Difficulty:</b> {{exercise.difficulty}}
+                                    </td>
+                                </tr>
+                                <tr class="collapse" id="collapse{{forloop.counter}}">
+                                    <td colspan="6">
+                                        <b>Instructions:</b> {{exercise.instructions}}
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p>Please submit to see exercises!</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
