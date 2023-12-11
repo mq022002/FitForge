@@ -26,17 +26,67 @@ def view_exercises(request):
         'filterform': filterform,
         'exerciseinworkoutform': exerciseinworkoutform
     }
-
+    """
+    if request.method == 'GET':
+        search = request.GET.get('search', None)
+        selected_muscle = request.GET.get('muscle', None)
+        selected_type = request.GET.get('type', None)
+        selected_difficulty = request.GET.get('difficulty', None)
+        page = int(request.GET.get('page', 1))
+        if page < 1:
+            page = 1
+        offset = (page - 1) * 10
+        exercises = api.get_exercises(name=search, muscle=selected_muscle, e_type=selected_type, pages=1, offset=offset)
+        
+        context['exercises'] = exercises
+        context['parameters'] = {
+                'search': search,
+                'muscle': selected_muscle,
+                'type': selected_type,
+                'difficulty': selected_difficulty
+            }
+        """
     if request.method == 'POST':
-        if filterform.is_valid():
+        if 'pagination' in request.POST:
+            # Call the API with the selected options
+            search = request.POST.get('search', None)
+            selected_muscle = request.POST.get('muscle', None)
+            selected_type = request.POST.get('type', None)
+            selected_difficulty = request.POST.get('difficulty', None)
+            page = int(request.POST.get('page', 1))
+            if page < 1:
+                page = 1
+            offset = (int(request.POST.get('page', 1)) - 1) * 10
+            exercises = api.get_exercises(name=search, muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=1, offset=offset)
+            context['exercises'] = exercises
+            context['parameters'] = {
+                'page': page,
+                'search': search,
+                'muscle': selected_muscle,
+                'type': selected_type,
+                'difficulty': selected_difficulty
+            }
+        
+        elif filterform.is_valid():
             # Call the API with the selected options
             search = filterform.cleaned_data['exercise_name']
             selected_muscle = filterform.cleaned_data['exercise_muscle_group']
             selected_type = filterform.cleaned_data['exercise_type']
             selected_difficulty = filterform.cleaned_data['exercise_difficulty']
 
-            exercises = api.get_exercises(name=search, muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=3)
+            page = int(request.POST.get('page', 1))
+            if page < 1:
+                page = 1
+            offset = (int(request.POST.get('page', 1)) - 1) * 10
+            exercises = api.get_exercises(name=search, muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=1, offset=offset)
             context['exercises'] = exercises
+            context['parameters'] = {
+                'page': page,
+                'search': search,
+                'muscle': selected_muscle,
+                'type': selected_type,
+                'difficulty': selected_difficulty
+            }
         
     return render(request, 'exercises/exercises.html', context)
 
