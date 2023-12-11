@@ -77,10 +77,42 @@ def create_workout(request):
     user_profile = request.user.userprofile
     
     if request.method == 'POST':
+        action = request.POST.get('action')
+
         if form.is_valid():
             workout = form.save(commit=False)
             workout.user = request.user.userprofile 
             workout.save()
+
+            if action == 'auto-generate':  # According to the action mapped to auto-generate-btn inside of workout-form.html
+                total_exercises = len(user_profile.focused_muscle_groups) * 2  # Number of rows that are going to be populated
+                rest_time = user_profile.workout_duration // total_exercises  # Take the user's preferred workout duration and divide it by the number of populated rows
+
+                for muscle_group in user_profile.focused_muscle_groups:
+                    exercises = api.get_exercises(muscle=muscle_group)  # Make API call to get exercises for each muscle in focused_muscle_groups
+                    if exercises:
+                        for exercise in exercises[:2]:  # Just grab the first 2 exercises for each muscle group
+                            sets, reps = 0, 0  # Self-explanatory variables
+
+                            if user_profile.fitness_goal == 'Get Stronger':
+                                sets, reps = 4, 5
+                                
+                            if user_profile.fitness_goal == 'Gain Muscle':
+                                sets, reps = 3, 8
+                                
+                            if user_profile.fitness_goal == 'Lose Fat':
+                                sets, reps = 3, 12
+
+                            ExerciseInWorkout.objects.create(  # Populate a row in ExerciseInWorkout table with each exercise
+                                workout=workout,
+                                name=exercise['name'],
+                                sets=sets,
+                                reps=reps,
+                                weight=None,
+                                rest_time=rest_time,
+                                notes=''
+                            )
+
             return redirect('workouts')
         
     context = {
