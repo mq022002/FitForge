@@ -44,13 +44,11 @@ function updatePagination(page) {
                 });
             } else if (index < $(pages).length - 1) {
                 if (index > 0) {  
-                    console.log("math", page - 1 + index)
                     $(value).find('a').text(index + page - 2)
                     $(value).find('a').click(function() {
                         postPagination(index + page - 2);
                     });
                     if (index == 2) {
-                        console.log("active index", index, page)
                         $(value).addClass('active');
                     } else  {
                         $(value).removeClass('active');
@@ -82,7 +80,6 @@ function postPagination(page) {
     };
     $.post('/exercises/', data, function (data) {
         let exercises = $('.container-fluid');
-        console.log("data", data);
         exercises.html($(data).find('.container-fluid')[0]);
         parameters.page = page;
         $('#id_exercise_muscle_group').val(parameters.muscle);
