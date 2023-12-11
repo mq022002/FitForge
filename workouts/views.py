@@ -35,7 +35,7 @@ def view_exercises(request):
             selected_type = filterform.cleaned_data['exercise_type']
             selected_difficulty = filterform.cleaned_data['exercise_difficulty']
 
-            exercises = api.get_exercises(name=search, muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty)
+            exercises = api.get_exercises(name=search, muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=3)
             context['exercises'] = exercises
         
     return render(request, 'exercises/exercises.html', context)
