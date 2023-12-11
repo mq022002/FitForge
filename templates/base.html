@@ -25,7 +25,7 @@
          mb-3 shadow">
         <div class="container">
           <a class="navbar-brand" href="{% url 'home' %}">
-            <img src="{% static 'images/FitForge_Logo.png' %}" width="30" height="30" alt="">
+            <img src="{% static 'images/FitForge_Logo.png' %}" width="30" height="30" alt="FitForge Logo">
             FitForge
           </a>        
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
@@ -68,24 +68,28 @@
     <div class="footer">
       <div class="container py-4">
         <div class="row">
-          <div class="col-md-4 align-self-center text-center text-md-start d-flex flex-column">
-            <a class="navbar-brand" href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'home' %}{% endif %}">
-              <img src="{% static 'images/FitForge_Logo.png' %}" width="120" height="auto" alt="">
+          <div class="col-md-4 align-self-center text-center text-md-start">
+            <a href="{% url 'home' %}">
+              <img src="{% static 'images/FitForge_Logo.png' %}" width="120" height="auto" alt="FitForge Logo">
             </a>        
           </div>
-          <div class="col-md-4 py-2 text-center text-md-start d-flex flex-column">
+          <div class="col-md-4 py-2 text-center text-md-start">
             <h4>FitForge</h4>
             {% if user.is_authenticated %}
-              <p><a class="text-decoration-none text-muted" href="{% url 'workouts' %}">Workouts</a></p>
+              <a class="text-decoration-none text-muted fs-5" href="{% url 'workouts' %}">Workouts</a>
+              <br>
             {% endif %}
-            <p><a class="text-decoration-none text-muted" href="{% url 'exercises' %}">Exercises</a></p>
-            <p><a class="text-decoration-none text-muted" href="{% url 'profile' %}">Profile</a></p>
+            <a class="text-decoration-none text-muted fs-5" href="{% url 'exercises' %}">Exercises</a>
+            <br>
+            <a class="text-decoration-none text-muted fs-5" href="{% url 'profile' %}">Profile</a>
           </div>
-          <div class="col-md-4 py-2 text-center text-md-start d-flex flex-column">
+          <div class="col-md-4 py-2 text-center text-md-start">
             <h4>Contact</h4>
-            <a class="fs-4" href="mailto:fitforge@polandmail.com"><i class="fas fa-envelope icon-color"></i></a>
-            <a class="fs-4" href="tel:2034790526"><i class="fas fa-phone icon-color"></i></a>
-            <a class="fs-4" href="https://github.com/mq022002/FitForge"><i class="fab fa-github icon-color"></i></a>
+            <a class="fs-5" href="mailto:fitforge@polandmail.com"><i class="fas fa-envelope icon-color"></i></a>
+            <br>
+            <a class="fs-5" href="tel:2034790526"><i class="fas fa-phone icon-color"></i></a>
+            <br>
+            <a class="fs-5" href="https://github.com/mq022002/FitForge"><i class="fab fa-github icon-color"></i></a>
           </div>          
         </div>
         <hr>
