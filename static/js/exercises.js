@@ -22,7 +22,6 @@ function updatePagination(page) {
                         postPagination(index)
                     });
                 } else if (index > 1) {
-                    console.log("above 1", index, value);
                     $(value).find('a').text(index)
                     $(value).find('a').click(function() {
                         postPagination(index)
@@ -67,8 +66,6 @@ function updatePagination(page) {
 
 
 function postPagination(page) {
-    console.log("postPagination", page)
-    console.log("parameters", parameters)
     let data = {
         'pagination': true,
         'page': page,
