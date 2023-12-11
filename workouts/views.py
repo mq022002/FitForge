@@ -83,15 +83,13 @@ def create_workout(request):
             workout = form.save(commit=False)
             workout.user = request.user.userprofile 
             workout.save()
-
-            print(f"User's fitness goal: {user_profile.fitness_goal}")
-
-            if action == 'auto-generate':
+            
+            if action == 'auto-generate': # According to the action mapped to auto-generate-btn inside of workout-form.html
                 for muscle_group in user_profile.focused_muscle_groups:
-                    exercises = api.get_exercises(muscle=muscle_group)
+                    exercises = api.get_exercises(muscle=muscle_group) # Make API call to get exercises for each muscle in focused_muscle_groups
                     if exercises:
-                        for exercise in exercises[:2]:  # Get the first two exercises
-                            sets, reps, rest_time = 0, 0, 0
+                        for exercise in exercises[:2]: # Just grab the first 2 exercises for each muscle group
+                            sets, reps, rest_time = 0, 0, 0 # Self-explanatory variables
 
                             if user_profile.fitness_goal == 'Get Stronger':
                                 sets, reps, rest_time = 4, 5, 4
@@ -102,7 +100,7 @@ def create_workout(request):
                             if user_profile.fitness_goal == 'Lose Fat':
                                 sets, reps, rest_time = 3, 12, 1
 
-                            ExerciseInWorkout.objects.create(
+                            ExerciseInWorkout.objects.create( # Populate a row in ExerciseInWorkout table with each exercise
                                 workout=workout,
                                 name=exercise['name'],
                                 sets=sets,
