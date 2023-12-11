@@ -6,6 +6,12 @@
 {% endblock %}
 
 {% block content %}
+<style>
+    /* remove required red outline */
+    label.required::after {
+        content: "";
+    }
+</style>
 <div class="container"> 
     <h1 class="display-4">Create a Workout</h1>
     <form method="post" action="{% url 'create_workout' %}">
