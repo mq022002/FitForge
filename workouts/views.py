@@ -77,11 +77,48 @@ def create_workout(request):
     user_profile = request.user.userprofile
     
     if request.method == 'POST':
+        action = request.POST.get('action')
+
         if form.is_valid():
             workout = form.save(commit=False)
             workout.user = request.user.userprofile 
             workout.save()
+
+            print(f"User's fitness goal: {user_profile.fitness_goal}")
+
+            if action == 'auto-generate':
+                for muscle_group in user_profile.focused_muscle_groups:
+                    exercises = api.get_exercises(muscle=muscle_group)
+                    if exercises:
+                        for exercise in exercises[:2]:  # Get the first two exercises
+                            sets, reps, rest_time = 0, 0, 0
+
+                            if user_profile.fitness_goal == 'Get Stronger':
+                                sets, reps, rest_time = 4, 5, 4
+                                
+                            if user_profile.fitness_goal == 'Gain Muscle':
+                                sets, reps, rest_time = 3, 8, 2
+                                
+                            if user_profile.fitness_goal == 'Lose Fat':
+                                sets, reps, rest_time = 3, 12, 1
+
+                            ExerciseInWorkout.objects.create(
+                                workout=workout,
+                                name=exercise['name'],
+                                sets=sets,
+                                reps=reps,
+                                weight=None,
+                                rest_time=rest_time,
+                                notes=''
+                            )
+
             return redirect('workouts')
+        
+    context = {
+        'form': form,
+        'user_profile': user_profile,
+    }
+    return render(request, 'workouts/workout-form.html', context)
         
     context = {
         'form': form,
