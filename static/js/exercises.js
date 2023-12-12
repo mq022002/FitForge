@@ -78,7 +78,10 @@ function postPagination(page) {
         let exercises = $('.container-fluid');
         exercises.html($(data).find('.container-fluid')[0]);
         parameters.page = page;
+        $('#id_exercise_search').val(parameters.search);
         $('#id_exercise_muscle_group').val(parameters.muscle);
+        $('#id_exercise_type').val(parameters.type);
+        $('#id_exercise_difficulty').val(parameters.difficulty);
         updatePagination(page); 
     });
 }
