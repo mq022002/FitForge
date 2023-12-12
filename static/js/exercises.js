@@ -60,7 +60,6 @@ function updatePagination(page) {
                 });
             }
         });
-        $('#previous').removeClass('disabled');
     }
 }
 

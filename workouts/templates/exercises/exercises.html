@@ -76,9 +76,6 @@ Exercises
                             {% endfor %}
                         </tbody>
                     </table>
-                    {% else %}
-                    <p>Please submit to see exercises!</p>
-                    {% endif %}
                     <nav aria-label="...">
                         <ul class="pagination">
                             <li class="page-item" id="previous">
@@ -98,6 +95,9 @@ Exercises
                             </li>
                         </ul>
                     </nav>
+                    {% else %}
+                    <p>Please submit to see exercises!</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
