@@ -153,8 +153,8 @@ def create_workout(request):
     return render(request, 'workouts/workout-form.html', context)
 
 @login_required
-def update_workout(request, id):
-    workout = Workout.objects.get(id=id)
+def update_workout(request, workout_index):
+    workout = get_user_workout(request.user, workout_index)
     form = WorkoutForm(request.POST or None, instance=workout)
     # check whether it's valid:
     if form.is_valid():
@@ -164,9 +164,8 @@ def update_workout(request, id):
     return redirect('workouts')
     
 @login_required
-def delete_workout(request, id):
-    workout = Workout.objects.get(id=id)
-
+def delete_workout(request, workout_index):
+    workout = get_user_workout(request.user, workout_index)
     # if this is a POST request, we need to delete the form data
     if request.method == 'POST':
         workout.delete()
@@ -174,15 +173,9 @@ def delete_workout(request, id):
     return redirect('workouts')
 
 @login_required
-def view_workout(request, workout_id):
-     # make id 0-indexed
-    workout_id -= 1
-    if workout_id < 0:
-        raise Http404()
-
-    workouts = list(Workout.objects.filter(user=request.user.id))
+def view_workout(request, workout_index):
+    workout = get_user_workout(request.user, workout_index)
     try:
-        workout = workouts[workout_id]
         exercises_in_workout = ExerciseInWorkout.objects.filter(workout=workout)
 
         for exercise in exercises_in_workout:
@@ -204,6 +197,15 @@ def view_workout(request, workout_id):
     }
     return render(request, 'workouts/workout.html', context=context)
 
+# this is not a view, this is a helper function as all the workouts views must do this
+def get_user_workout(user, workout_index):
+    # make id 0-indexed
+    workout_index -= 1
+    if workout_index < 0:
+        raise Http404()
+    workouts = list(Workout.objects.filter(user=user.id))
+    workout = workouts[workout_index]
+    return workout
 
 @login_required
 def delete_exercise_in_workout(request, workout_id):
