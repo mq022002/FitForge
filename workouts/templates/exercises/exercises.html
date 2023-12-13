@@ -51,7 +51,15 @@ Exercises
                                     <td>{{ exercise.muscle }}</td>
                                     <td>{{ exercise.type }}</td>
                                     <td class="d-none d-lg-table-cell">{{ exercise.equipment }}</td>
-                                    <td class="d-none d-lg-table-cell">{{ exercise.difficulty }}</td>
+                                    <td class="d-none d-lg-table-cell">
+                                        {% if exercise.difficulty == "Beginner" %}
+                                            <span class="badge bg-success">{{ exercise.difficulty }}</span>
+                                        {% elif exercise.difficulty == "Intermediate" %}
+                                            <span class="badge bg-warning text-dark">{{ exercise.difficulty }}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{ exercise.difficulty }}</span>
+                                        {% endif %}
+                                    </td>
                                     <td class="ps-5">
                                         <form method="post" action="{% url 'create_exercise_in_workout' exercise.name %}">
                                             {% csrf_token %}
