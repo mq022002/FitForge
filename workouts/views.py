@@ -248,7 +248,7 @@ def create_exercise_in_workout(request, exercise_name):
 def update_exercise_in_workout(request, exercise_in_workout_id):
     exercise_in_workout = ExerciseInWorkout.objects.get(id=exercise_in_workout_id, workout__user=request.user.id)
     if request.method == "POST":
-        form = ExerciseInWorkoutForm(request.POST, instance=exercise_in_workout)
+        form = ExerciseInWorkoutForm(request.POST, instance=exercise_in_workout, user=request.user.id, update=True)
         if form.is_valid():
             form.save()
             workouts = list(Workout.objects.filter(user=request.user.id))
@@ -256,7 +256,7 @@ def update_exercise_in_workout(request, exercise_in_workout_id):
             return redirect('view_workout', workout_index)
     else:
         # For a GET request, initialize the form with instance data
-        form = ExerciseInWorkoutForm(instance=exercise_in_workout)
+        form = ExerciseInWorkoutForm(instance=exercise_in_workout, update=True)
     return render(request, 'exercises/create_exercise_in_workout.html', {'form': form, 'exercise_name': exercise_in_workout.name})
 
 
