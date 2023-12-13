@@ -1,33 +1,33 @@
 {% extends "base.html" %}
+
+{% block title %}
+Exercises in Workout
+{% endblock title %}
+
 {% block content %}
 <style>
     .fixed-width {
         width: 25%;
     }
 </style>
-<script>
-    CSRFToken = '{{ csrf_token }}';
-    deleteExerciseURL = '{% url "delete_exercise" %}';
-</script>
-{% load static %}
-<script src="{% static 'js/workout.js' %}"></script>
-<div class="main-container container bg-light rounded shadow-lg p-4">
+<div class="main-container container {% if request.session.dark_mode == False %} bg-light {% endif %} rounded shadow-lg p-4">
     <h1 class="text-center display-3">Workout Viewer</h1>
     <hr>
     <div class="row">
         <h1 class="bold">{{workout.name}}</h1>
         <p><b>Notes:</b> {{workout.notes}}</p>
         <div>
-        {% for exercise in workout.exercises %}
+        {% for exercise in exercises %}
             <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title text-center">{{exercise.name}}</h5>
                     <hr>
-                    <table class="table">
+                    <table class="table text-center">
                         <thead>
                             <tr>
                                 <th scope="col" class="fixed-width">Sets</th>
                                 <th scope="col" class="fixed-width">Reps</th>
+                                <th scope="col" class="fixed-width">Rest Time (In Minutes)</th>
                                 <th scope="col" class="fixed-width">Weight</th>
                                 <th scope="col"  class="fixed-width">Notes</th>
                             </tr>
@@ -36,6 +36,7 @@
                             <tr>
                                 <td class="fs-5">{{ exercise.sets }}</td>
                                 <td class="fs-5">{{ exercise.reps }}</td>
+                                <td class="fs-5">{{ exercise.rest_time }}</td>
                                 <td class="fs-5">{{ exercise.weight }}</td>
                                 <td class="fs-5">{{ exercise.exercise_notes }}</td>
                             </tr>
@@ -46,32 +47,42 @@
                             More Details
                         </div>
                         <div class="ms-1">
-                            <button type="submit" class="btn btn-danger delete" data-id="{{exercise.id}}"><i class="fa-solid fa-trash"></i></button>
+                            <form method="post" action="{% url 'delete_exercise_in_workout' exercise.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger delete">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>
+                                </button>
+                            </form>
                         </div>
                     </div>
                     <div class="collapse" id="collapse{{exercise.id}}">
                         <hr>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card-body">
-                                    <p class="card-text"><b>Type: </b>{{ exercise.type }}</p>
-                                    <p class="card-text"><b>Muscle: </b>{{ exercise.muscle }}</p>
-                                    <p class="card-text"><b>Equipment: </b>{{ exercise.equipment }}</p>
-                                    <p class="card-text"><b>Difficulty: </b>{{ exercise.difficulty }}</p>   
-                                </div>    
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card-body">
-                                    <p><b>Instructions: </b>{{exercise.instructions}}</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="embed-responsive embed-responsive-16by9">
-                                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{exercise.youtube.id}}" allowfullscreen></iframe>
-                                </div>
-                            </div>
+                        <div class="table-responsive">
+                            <table class="table text-center">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="fixed-width">Type</th>
+                                        <th scope="col" class="fixed-width">Muscle</th>
+                                        <th scope="col" class="fixed-width">Equipment</th>
+                                        <th scope="col" class="fixed-width">Difficulty</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fs-5">{{ exercise.type }}</td>
+                                        <td class="fs-5">{{ exercise.muscle}}</td>
+                                        <td class="fs-5">{{ exercise.equipment }}</td>
+                                        <td class="fs-5">{{ exercise.difficulty  }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        
+                        <div class="card-body">
+                            <p><b>Instructions: </b>{{ exercise.instructions }}</p>
+                        </div>
+                        <div class="ratio ratio-16x9">
+                            <iframe src="https://www.youtube.com/embed/{{exercise.youtube.id}}" title="YouTube video" allowfullscreen></iframe>
+                        </div>
                     </div>    
                 </div>
             </div>

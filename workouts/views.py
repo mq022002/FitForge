@@ -2,60 +2,74 @@ from typing import Any
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from . import api
-from django.views.generic import ListView, DetailView, TemplateView
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .forms import WorkoutForm
 from django.http import HttpResponse, JsonResponse, Http404
 from django.db import transaction, IntegrityError
+from .forms import ExerciseFilterForm, ExerciseInWorkoutForm
+import json
+from django.contrib.auth.models import User
 # Create your views here.
 
 def home(request):
-    # return HttpResponse("Hello, Django!")
-    context = {'name': 'John'}
+    user_count = User.objects.count()
+    context = {'user_count': user_count}
     return render(request, 'home.html', context)
 
-# Only responsible for grabbing information that should be shown when the page loads
-def exercises(request):
-    type_list = api.exercise_types
-    muscle_list = api.exercise_muscles
-    difficulty_list = api.exercise_difficulties
-
-    workouts = Workout.objects.filter(user=request.user.id)
-    workout_list = []
-    for workout in workouts:
-        workout_list.append({'id': workout.id, 'name': workout.name})
+def view_exercises(request):
+    filterform = ExerciseFilterForm(request.POST or None)
+    exerciseinworkoutform = ExerciseInWorkoutForm(request.POST or None)
 
     context = {
-        'muscles': muscle_list,
-        'types': type_list,
-        'difficulties': difficulty_list,
-        'workout_list': workout_list
+        'filterform': filterform,
+        'exerciseinworkoutform': exerciseinworkoutform
     }
-    return render(request, 'exercises/exercises.html', context)
 
-
-def read_exercises(request):
     if request.method == 'POST':
-        # Use the .get() method with a default value of None
-        # Filters
-        selected_muscle = request.POST.get('muscle', None)
-        selected_type = request.POST.get('type', None)
-        selected_difficulty = request.POST.get('difficulty', None)
-        page = request.POST.get('page', 0)
+        if 'pagination' in request.POST:
+            # Call the API with the selected options
+            search = request.POST.get('search', None)
+            selected_muscle = request.POST.get('muscle', None)
+            selected_type = request.POST.get('type', None)
+            selected_difficulty = request.POST.get('difficulty', None)
+            page = int(request.POST.get('page', 1))
+            if page < 1:
+                page = 1
+            offset = (int(request.POST.get('page', 1)) - 1) * 10
+            exercises = api.get_exercises(name=search, muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=1, offset=offset)
+            context['exercises'] = exercises
+            context['parameters'] = {
+                'page': page,
+                'search': search,
+                'muscle': selected_muscle,
+                'type': selected_type,
+                'difficulty': selected_difficulty
+            }
+        
+        elif filterform.is_valid():
+            # Call the API with the selected options
+            search = filterform.cleaned_data['exercise_name']
+            selected_muscle = filterform.cleaned_data['exercise_muscle_group']
+            selected_type = filterform.cleaned_data['exercise_type']
+            selected_difficulty = filterform.cleaned_data['exercise_difficulty']
 
-        # how many pages to fetch from api (page = 10 results)
-        api_pages_to_return = 3
-
-        # offset from api = page from request * 10 * pages to return from api
-        offset = page * api_pages_to_return * 10
-
-        # API call
-        exercises = api.get_exercises(muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=api_pages_to_return, offset=offset)
-
-
-        return JsonResponse({'exercises': exercises})
+            page = int(request.POST.get('page', 1))
+            if page < 1:
+                page = 1
+            offset = (int(request.POST.get('page', 1)) - 1) * 10
+            exercises = api.get_exercises(name=search, muscle=selected_muscle, e_type=selected_type, difficulty=selected_difficulty, pages=1, offset=offset)
+            context['exercises'] = exercises
+            context['parameters'] = {
+                'page': page,
+                'search': search,
+                'muscle': selected_muscle,
+                'type': selected_type,
+                'difficulty': selected_difficulty
+            }
+        
+    return render(request, 'exercises/exercises.html', context)
 
 
 def read_workout(request):
@@ -68,71 +82,7 @@ def read_workout(request):
         return JsonResponse({'workout': workout_details})
 
 
-def add_exercise(request):
-    if request.method == 'POST':
-        try:
-            exercise_name = request.POST.get('exercise_name')
-            exercise_type = request.POST.get('exercise_type')
-            exercise_muscle = request.POST.get('exercise_muscle')
-            exercise_equipment = request.POST.get('exercise_equipment')
-            exercise_difficulty = request.POST.get('exercise_difficulty')
-            exercise_instructions = request.POST.get('exercise_instructions')
-            sets = request.POST.get('sets')
-            reps = request.POST.get('reps')
-            weight = request.POST.get('weight')
-            notes = request.POST.get('notes')
-            workout_id = request.POST.get('workout_id')
-            # makes sure both db inserts are successful
-            with transaction.atomic():
-                # if exercise doesn't exist in db, add it
-                if not Exercise.objects.filter(name=exercise_name).exists():
-                    exercise_insert = Exercise(
-                        name=exercise_name, 
-                        type=exercise_type,
-                        muscle=exercise_muscle,
-                        equipment=exercise_equipment,
-                        difficulty=exercise_difficulty,
-                        instructions=exercise_instructions
-                    )
-                    exercise_insert.save()
-                # add exercise to workout
-                exercise = Exercise.objects.get(name=exercise_name)
-                workout = Workout.objects.get(id=workout_id)
-                exercise_in_workout = ExerciseInWorkout(
-                    exercise_id=exercise,
-                    workout_id=workout,
-                    sets=sets,
-                    reps=reps,
-                    weight=weight,
-                    notes=notes
-                )
-                exercise_in_workout.save()
-        except IntegrityError:
-            # if there is an error, return a bad request
-            return HttpResponse(status=400)
-        # return a success response
-        return HttpResponse(status=200)
 
-
-def exercise_detail(request, exercise_name):
-    try:
-        exercise = api.get_exercises(name=exercise_name)[0]
-        video = api.fetch_youtube_link(exercise['name'])
-        if(video):
-            url = "https://www.youtube.com/embed/" + video['id']
-            context = {
-                'exercise': exercise,
-                'url': url
-            }
-        else:
-            context = {
-                'exercise': exercise,
-            }
-    except Exception as e:
-        print(f"Error in exercise_detail: {e}")
-        raise Http404("Invalid exercise search")
-    
-    return render(request, 'exercises/exercise_detail.html', context)
 
     
 @login_required
@@ -154,21 +104,63 @@ def workouts(request):
 
 @login_required
 def create_workout(request):
-    # Create a form instance and populate it with data from the request
     form = WorkoutForm(request.POST or None)
+    user_profile = request.user.userprofile
     
     if request.method == 'POST':
+        action = request.POST.get('action')
+
         if form.is_valid():
             workout = form.save(commit=False)
-            workout.user = request.user.userprofile  # Set the user from the currently authenticated user
+            workout.user = request.user.userprofile 
             workout.save()
+
+            if action == 'auto-generate':  # According to the action mapped to auto-generate-btn inside of workout-form.html
+
+                total_exercises = 2  # Determine the number of exercises based on overall_intensity. Sets the default to 2, which would be 'Medium Intensity'
+                if user_profile.overall_intensity == 'High Intensity':
+                    total_exercises = 3
+                elif user_profile.overall_intensity == 'Low Intensity':
+                    total_exercises = 1
+                    
+                rest_time = user_profile.workout_duration // total_exercises  # Take the user's preferred workout duration and divide it by the number of populated rows
+
+                for muscle_group in user_profile.focused_muscle_groups:
+                    exercises = api.get_exercises(muscle=muscle_group)  # Make API call to get exercises for each muscle in focused_muscle_groups
+                    if exercises:
+                        for exercise in exercises[:total_exercises]:  # Just grab the first num_exercises exercises for each muscle group
+                            sets, reps = 0, 0  # Self-explanatory variables
+
+                            if user_profile.fitness_goal == 'Get Stronger':
+                                sets, reps = 4, 5
+                                
+                            if user_profile.fitness_goal == 'Gain Muscle':
+                                sets, reps = 3, 8
+                                
+                            if user_profile.fitness_goal == 'Lose Fat':
+                                sets, reps = 3, 12
+
+                            ExerciseInWorkout.objects.create(  # Populate a row in ExerciseInWorkout table with each exercise
+                                workout=workout,
+                                name=exercise['name'],
+                                sets=sets,
+                                reps=reps,
+                                weight=None,
+                                rest_time=rest_time,
+                                notes=''
+                            )
+
             return redirect('workouts')
-    # if the request does not have post data, a blank form will be rendered
-    return render(request, 'workouts/workout-form.html', {'form': form})
+        
+    context = {
+        'form': form,
+        'user_profile': user_profile,
+    }
+    return render(request, 'workouts/workout-form.html', context)
 
 @login_required
-def update_workout(request, id):
-    workout = Workout.objects.get(id=id)
+def update_workout(request, workout_index):
+    workout = get_user_workout(request.user, workout_index)
     form = WorkoutForm(request.POST or None, instance=workout)
     # check whether it's valid:
     if form.is_valid():
@@ -178,55 +170,84 @@ def update_workout(request, id):
     return redirect('workouts')
     
 @login_required
-def delete_workout(request, id):
-    workout = Workout.objects.get(id=id)
-
+def delete_workout(request, workout_index):
+    workout = get_user_workout(request.user, workout_index)
     # if this is a POST request, we need to delete the form data
     if request.method == 'POST':
         workout.delete()
         # after deleting redirect to view_product page
     return redirect('workouts')
 
-
-def view_workout(request, id):
-    # make id 0-indexed
-    id -= 1
-    if id < 0:
-        raise Http404("Workout does not exist")
-
-    workouts = list(Workout.objects.filter(user=request.user.id))
-    print('workouts: ', workouts)
+@login_required
+def view_workout(request, workout_index):
+    workout = get_user_workout(request.user, workout_index)
     try:
-        workout = workouts[id].get_workout_details()
-        for exercise in workout['exercises']:
-            exercise['youtube'] = api.fetch_youtube_link(exercise['name'] + " tutorial")
-        #for exercise in workout['exercises']:
-        #    exercise['image'] = api.fetch_exercise_image(exercise['name'])
-        print('workout: ', workout)
-    except:
-        print("Workout does not exist")
-        raise Http404("Workout does not exist")
+        exercises_in_workout = ExerciseInWorkout.objects.filter(workout=workout)
 
-    context = { 'workout': workout }
+        for exercise in exercises_in_workout:
+            exercise_detail = api.get_exercises(name=exercise.name)[0]
+            exercise.type = exercise_detail['type']
+            exercise.equipment = exercise_detail['equipment']
+            exercise.muscle = exercise_detail['muscle']
+            exercise.difficulty = exercise_detail['difficulty']
+            exercise.instructions = exercise_detail['instructions']
+            exercise.youtube = api.fetch_youtube_link(exercise.name + " tutorial")
+
+    except Exception as e:
+        print(e)
+        raise Http404()
+    
+    context = {
+        'workout': workout,
+        'exercises': exercises_in_workout
+    }
     return render(request, 'workouts/workout.html', context=context)
 
+# this is not a view, this is a helper function as all the workouts views must do this
+def get_user_workout(user, workout_index):
+    try:
+        # make id 0-indexed
+        workout_index -= 1
+        if workout_index < 0:
+            raise Http404()
+        workouts = list(Workout.objects.filter(user=user.id))
+        workout = workouts[workout_index]
+    except IndexError:
+        raise Http404()
+    return workout
 
 @login_required
-def delete_exercise_from_workout(request):
+def delete_exercise_in_workout(request, workout_id):
     if request.method == 'POST':
-        exercise_id = request.POST.get('id', None)  
-        exercise = ExerciseInWorkout.objects.get(id=exercise_id)
-        
-        workout_id = exercise.workout_id.id
+        exercise = ExerciseInWorkout.objects.get(id=workout_id)
+        workout_id = exercise.workout.id
         user = request.user.id
         # check if workout belongs to user
         workout = Workout.objects.get(id=workout_id, user=user)
         if workout:
             exercise.delete()
-            return HttpResponse(status=200)
-        
-    return HttpResponse(status=400)
-    
+        workouts = list(Workout.objects.filter(user=request.user.id))
+        workout_index = workouts.index(workout) + 1
+        print(workout_index)
+    return redirect('view_workout', workout_index)
+
+@login_required
+def create_exercise_in_workout(request, exercise_name):
+    form = ExerciseInWorkoutForm(request.POST or None, user=request.user)
+    context = {
+        'form': form,
+        'exercise_name': exercise_name
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            exercise_in_workout = form.save(commit=False)
+            exercise_in_workout.name = exercise_name
+            exercise_in_workout.save()
+            return redirect('exercises')
+
+    return render(request, 'exercises/create_exercise_in_workout.html', context)
+
+
 
 def error_404(request, *args, **kwargs):
     context = {"error": "404"}
