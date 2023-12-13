@@ -256,7 +256,7 @@ def update_exercise_in_workout(request, exercise_in_workout_id):
             return redirect('view_workout', workout_index)
     else:
         # For a GET request, initialize the form with instance data
-        form = ExerciseInWorkoutForm(user=request.user, instance=exercise_in_workout)
+        form = ExerciseInWorkoutForm(instance=exercise_in_workout)
     return render(request, 'exercises/create_exercise_in_workout.html', {'form': form, 'exercise_name': exercise_in_workout.name})
 
 
