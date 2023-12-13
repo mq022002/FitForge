@@ -206,8 +206,7 @@ def get_user_workout(user, workout_index):
             raise Http404()
         workouts = list(Workout.objects.filter(user=user.id))
         workout = workouts[workout_index]
-    except Exception as e:
-        print(e)
+    except IndexError:
         raise Http404()
     return workout
 
