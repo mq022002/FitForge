@@ -47,6 +47,14 @@ Exercises in Workout
                             More Details
                         </div>
                         <div class="ms-1">
+                            <form method="post" action="{% url 'update_exercise_in_workout' exercise.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-warning">
+                                    Edit
+                                </button>
+                            </form>
+                        </div>
+                        <div class="ms-1">
                             <form method="post" action="{% url 'delete_exercise_in_workout' exercise.id %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger delete">
