@@ -14,3 +14,8 @@
 .icon-color{
     color: rgb(51, 201, 208);
 }
+
+
+* {
+    font-family: 'Poppins', sans-serif;
+}
