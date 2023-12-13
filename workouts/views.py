@@ -213,16 +213,15 @@ def get_user_workout(user, workout_index):
 @login_required
 def delete_exercise_in_workout(request, workout_id):
     if request.method == 'POST':
-        exercise = ExerciseInWorkout.objects.get(id=workout_id)
-        workout_id = exercise.workout.id
-        user = request.user.id
-        # check if workout belongs to user
-        workout = Workout.objects.get(id=workout_id, user=user)
-        if workout:
+        try:
+            exercise = ExerciseInWorkout.objects.get(id=workout_id, workout__user=request.user.id)
             exercise.delete()
-        workouts = list(Workout.objects.filter(user=request.user.id))
-        workout_index = workouts.index(workout) + 1
-        print(workout_index)
+            
+            workouts = list(Workout.objects.filter(user=request.user.id))
+            workout = Workout.objects.get(id=exercise.workout_id, user=request.user.id)
+            workout_index = workouts.index(workout) + 1
+        except:
+            return redirect('workouts')
     return redirect('view_workout', workout_index)
 
 @login_required
