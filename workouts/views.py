@@ -199,12 +199,16 @@ def view_workout(request, workout_index):
 
 # this is not a view, this is a helper function as all the workouts views must do this
 def get_user_workout(user, workout_index):
-    # make id 0-indexed
-    workout_index -= 1
-    if workout_index < 0:
+    try:
+        # make id 0-indexed
+        workout_index -= 1
+        if workout_index < 0:
+            raise Http404()
+        workouts = list(Workout.objects.filter(user=user.id))
+        workout = workouts[workout_index]
+    except Exception as e:
+        print(e)
         raise Http404()
-    workouts = list(Workout.objects.filter(user=user.id))
-    workout = workouts[workout_index]
     return workout
 
 @login_required
