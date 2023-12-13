@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     #'django.contrib.staticfiles',
     'workouts.apps.WorkoutsConfig',
-    'django_browser_reload',
+    #'django_browser_reload',
     'users',
     'crispy_forms',
     'crispy_bootstrap5',
@@ -62,7 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
+    #"django_browser_reload.middleware.BrowserReloadMiddleware",
     "django.middleware.security.SecurityMiddleware",
 ]
 
