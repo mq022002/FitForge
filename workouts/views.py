@@ -246,10 +246,9 @@ def create_exercise_in_workout(request, exercise_name):
 
 @login_required
 def update_exercise_in_workout(request, exercise_in_workout_id):
-    exercise_in_workout = ExerciseInWorkout.objects.get(id=exercise_in_workout_id)
-
+    exercise_in_workout = ExerciseInWorkout.objects.get(id=exercise_in_workout_id, workout__user=request.user.id)
     if request.method == "POST":
-        form = ExerciseInWorkoutForm(request.POST, user=request.user, instance=exercise_in_workout)
+        form = ExerciseInWorkoutForm(request.POST, instance=exercise_in_workout)
         if form.is_valid():
             form.save()
             workouts = list(Workout.objects.filter(user=request.user.id))
@@ -259,6 +258,7 @@ def update_exercise_in_workout(request, exercise_in_workout_id):
         # For a GET request, initialize the form with instance data
         form = ExerciseInWorkoutForm(user=request.user, instance=exercise_in_workout)
     return render(request, 'exercises/create_exercise_in_workout.html', {'form': form, 'exercise_name': exercise_in_workout.name})
+
 
 def error_404(request, *args, **kwargs):
     context = {"error": "404"}

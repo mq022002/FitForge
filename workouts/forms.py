@@ -53,13 +53,13 @@ class WorkoutForm(forms.ModelForm):
         fields = ['name', 'notes']
 
 class ExerciseInWorkoutForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        #user = kwargs.pop('user', None)
+        super(ExerciseInWorkoutForm, self).__init__(*args, **kwargs)
+        #if user is not None:
+        #    self.fields['workout'].queryset = Workout.objects.filter(user__user=user)
+
     class Meta:
         model = ExerciseInWorkout
         fields = '__all__'
-        exclude = ('name',)
-
-    def __init__(self, *args, **kwargs):
-            user = kwargs.pop('user', None)
-            super(ExerciseInWorkoutForm, self).__init__(*args, **kwargs)
-            if user is not None:
-                self.fields['workout'].queryset = Workout.objects.filter(user__user=user)
+        exclude = ('name', 'workout')
