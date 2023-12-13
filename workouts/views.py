@@ -28,7 +28,7 @@ def view_exercises(request):
     }
 
     if request.method == 'POST':
-        if 'pagination' in request.POST:
+        if 'pagination' in request.POST and filterform.is_valid():
             # Call the API with the selected options
             search = request.POST.get('search', None)
             selected_muscle = request.POST.get('muscle', None)
