@@ -3,7 +3,7 @@ beautifulsoup4==4.12.2
 certifi==2023.11.17
 charset-normalizer==3.3.2
 crispy-bootstrap5==2023.10
-Django==5.0
+Django==4.2.8
 django-browser-reload==1.12.1
 django-crispy-forms==2.1
 gunicorn==21.2.0
