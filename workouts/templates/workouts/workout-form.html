@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-    Create a Workout
+    Workout Form
 {% endblock %}
 
 {% block content %}
@@ -13,7 +13,7 @@
     }
 </style>
 <div class="container"> 
-    <h1 class="display-4">Create a Workout</h1>
+    <h1 class="display-4">Workout Form</h1>
     <form method="post">
         {% csrf_token %}
         {{ form|crispy }}
