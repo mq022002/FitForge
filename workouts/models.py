@@ -19,3 +19,6 @@ class ExerciseInWorkout(models.Model):
     weight = models.FloatField(null=True, blank=True)
     rest_time = models.IntegerField(default=0)
     notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name + " - " + self.workout.name

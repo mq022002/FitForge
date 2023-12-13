@@ -14,7 +14,7 @@
 </style>
 <div class="container"> 
     <h1 class="display-4">Create a Workout</h1>
-    <form method="post" action="{% url 'create_workout' %}">
+    <form method="post">
         {% csrf_token %}
         {{ form|crispy }}
 
@@ -23,7 +23,6 @@
             <button type="reset" class="btn btn-warning"><i class="fas fa-redo-alt"></i> Reset</button>
             <button type="submit" name="action" value="save" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
             <button type="submit" name="action" value="auto-generate" id="auto-generate-btn" class="btn btn-success">Auto Generate</button>
-
         </div>
     </form>
 </div>

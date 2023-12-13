@@ -28,7 +28,7 @@ def view_exercises(request):
     }
 
     if request.method == 'POST':
-        if 'pagination' in request.POST:
+        if 'pagination' in request.POST and filterform.is_valid():
             # Call the API with the selected options
             search = request.POST.get('search', None)
             selected_muscle = request.POST.get('muscle', None)
@@ -161,13 +161,14 @@ def create_workout(request):
 @login_required
 def update_workout(request, workout_index):
     workout = get_user_workout(request.user, workout_index)
-    form = WorkoutForm(request.POST or None, instance=workout)
-    # check whether it's valid:
-    if form.is_valid():
-        # update the record in the db
-        form.save()
-    
-    return redirect('workouts')
+    form = WorkoutForm(instance=workout)
+    if request.method == 'POST':
+        form = WorkoutForm(request.POST, instance=workout)
+        if form.is_valid():
+            form.save()
+            return redirect('workouts')
+    return render(request, 'workouts/workout-form.html', {'form': form})
+
     
 @login_required
 def delete_workout(request, workout_index):
@@ -217,19 +218,15 @@ def get_user_workout(user, workout_index):
     return workout
 
 @login_required
-def delete_exercise_in_workout(request, workout_id):
+def delete_exercise_in_workout(request, exercise_in_workout_id):
     if request.method == 'POST':
-        exercise = ExerciseInWorkout.objects.get(id=workout_id)
-        workout_id = exercise.workout.id
-        user = request.user.id
-        # check if workout belongs to user
-        workout = Workout.objects.get(id=workout_id, user=user)
-        if workout:
-            exercise.delete()
+        exercise_in_workout = ExerciseInWorkout.objects.get(id=exercise_in_workout_id, workout__user=request.user.id)
+        exercise_in_workout.delete()
+        
         workouts = list(Workout.objects.filter(user=request.user.id))
-        workout_index = workouts.index(workout) + 1
-        print(workout_index)
-    return redirect('view_workout', workout_index)
+        workout_index = workouts.index(exercise_in_workout.workout) + 1
+        return redirect('view_workout', workout_index)
+    return redirect('workouts')
 
 @login_required
 def create_exercise_in_workout(request, exercise_name):
@@ -247,6 +244,20 @@ def create_exercise_in_workout(request, exercise_name):
 
     return render(request, 'exercises/create_exercise_in_workout.html', context)
 
+@login_required
+def update_exercise_in_workout(request, exercise_in_workout_id):
+    exercise_in_workout = ExerciseInWorkout.objects.get(id=exercise_in_workout_id, workout__user=request.user.id)
+    if request.method == "POST":
+        form = ExerciseInWorkoutForm(request.POST, instance=exercise_in_workout)
+        if form.is_valid():
+            form.save()
+            workouts = list(Workout.objects.filter(user=request.user.id))
+            workout_index = workouts.index(exercise_in_workout.workout) + 1
+            return redirect('view_workout', workout_index)
+    else:
+        # For a GET request, initialize the form with instance data
+        form = ExerciseInWorkoutForm(user=request.user, instance=exercise_in_workout)
+    return render(request, 'exercises/create_exercise_in_workout.html', {'form': form, 'exercise_name': exercise_in_workout.name})
 
 
 def error_404(request, *args, **kwargs):

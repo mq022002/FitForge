@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib import messages
 from .forms import UserProfileForm, UserCreateForm
@@ -71,3 +71,9 @@ def toggle_dark_mode(request):
         request.session['dark_mode'] = True
     #return JsonResponse({'dark_mode': request.session['dark_mode']})
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+
+@login_required
+def logout_user(request):
+    logout(request)
+    return redirect('home')
