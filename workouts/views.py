@@ -116,13 +116,19 @@ def create_workout(request):
             workout.save()
 
             if action == 'auto-generate':  # According to the action mapped to auto-generate-btn inside of workout-form.html
-                total_exercises = len(user_profile.focused_muscle_groups) * 2  # Number of rows that are going to be populated
+
+                total_exercises = 2  # Determine the number of exercises based on overall_intensity. Sets the default to 2, which would be 'Medium Intensity'
+                if user_profile.overall_intensity == 'High Intensity':
+                    total_exercises = 3
+                elif user_profile.overall_intensity == 'Low Intensity':
+                    total_exercises = 1
+                    
                 rest_time = user_profile.workout_duration // total_exercises  # Take the user's preferred workout duration and divide it by the number of populated rows
 
                 for muscle_group in user_profile.focused_muscle_groups:
                     exercises = api.get_exercises(muscle=muscle_group)  # Make API call to get exercises for each muscle in focused_muscle_groups
                     if exercises:
-                        for exercise in exercises[:2]:  # Just grab the first 2 exercises for each muscle group
+                        for exercise in exercises[:total_exercises]:  # Just grab the first num_exercises exercises for each muscle group
                             sets, reps = 0, 0  # Self-explanatory variables
 
                             if user_profile.fitness_goal == 'Get Stronger':
