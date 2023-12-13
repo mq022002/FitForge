@@ -90,3 +90,7 @@ Exercises in Workout
     </div>
 </div>
 {% endblock content %}
+{% block scripts %}
+{% load static %}
+<script src="{% static 'js/workout.js' %}" type="text/javascript"></script>
+{% endblock scripts %}
